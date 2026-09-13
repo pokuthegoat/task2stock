@@ -1,5 +1,7 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+Google OAuth, proof file storage, and the `/contact` recipient are documented in [`docs/auth-and-storage.md`](docs/auth-and-storage.md). Copy `.env.example` to `.env` before running locally.
+
 ## Getting Started
 
 First, run the development server:
