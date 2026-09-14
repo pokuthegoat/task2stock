@@ -12,6 +12,7 @@ import {
   openOAuthState,
   readGoogleProfile,
 } from "@/lib/auth/google";
+import { afterAuthPath } from "@/lib/auth/profile-gate";
 import { persistSessionRow, sessionCookie } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
@@ -91,7 +92,9 @@ export async function GET(request: NextRequest) {
 
   try {
     const { token, expiresAt } = await persistSessionRow(result.user.id);
-    const response = NextResponse.redirect(new URL("/tasks", origin));
+    const response = NextResponse.redirect(
+      new URL(afterAuthPath(result.user), origin),
+    );
     response.cookies.set(sessionCookie(token, expiresAt));
     return clearOAuthCookies(response);
   } catch (caught) {

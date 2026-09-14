@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { afterAuthPath } from "@/lib/auth/profile-gate";
 import {
   signInWithPassword,
   signOut as clearSession,
@@ -37,7 +38,7 @@ export async function signInAction(
   }
 
   revalidatePath("/", "layout");
-  redirect("/tasks");
+  redirect(afterAuthPath(result.user));
 }
 
 export async function signUpAction(
@@ -61,7 +62,7 @@ export async function signUpAction(
   }
 
   revalidatePath("/", "layout");
-  redirect("/tasks");
+  redirect(afterAuthPath(result.user));
 }
 
 export async function signOutAction() {

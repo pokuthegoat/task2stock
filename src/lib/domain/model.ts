@@ -12,7 +12,7 @@
  * It does not pay, settle, or create a Holding.
  * My Work (`/work`) lists the signed-in user's TaskAttempts and derives
  * status from this same chain. It does not store a second activity table.
- * Account (`/account`) reads and updates the authenticated User row only.
+ * Profile (`/profile`) reads and updates the authenticated User row only.
  */
 
 export type UserId = string;

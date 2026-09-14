@@ -9,5 +9,10 @@ import { getSession } from "@/lib/auth/session";
  */
 export async function readParticipantId(): Promise<string | null> {
   const session = await getSession();
-  return session?.user.id ?? null;
+
+  if (!session?.user.username) {
+    return null;
+  }
+
+  return session.user.id;
 }

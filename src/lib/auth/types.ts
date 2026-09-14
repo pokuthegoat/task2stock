@@ -1,7 +1,9 @@
 export type AuthUser = {
   id: string;
   name: string;
+  username: string | null;
   email: string | null;
+  avatarUrl: string | null;
   hasPassword: boolean;
 };
 
@@ -13,13 +15,26 @@ export type AuthResult =
   | { ok: true; user: AuthUser }
   | {
       ok: false;
-      code: "VALIDATION" | "INVALID_CREDENTIALS" | "EMAIL_TAKEN" | "UNAVAILABLE";
+      code:
+        | "VALIDATION"
+        | "INVALID_CREDENTIALS"
+        | "EMAIL_TAKEN"
+        | "USERNAME_TAKEN"
+        | "COOLDOWN"
+        | "UNAVAILABLE";
       message: string;
     };
 
 export type FieldErrors = Partial<
   Record<
-    "name" | "email" | "password" | "confirmPassword" | "currentPassword",
+    | "name"
+    | "username"
+    | "displayName"
+    | "avatarUrl"
+    | "email"
+    | "password"
+    | "confirmPassword"
+    | "currentPassword",
     string
   >
 >;

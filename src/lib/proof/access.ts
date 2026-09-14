@@ -7,7 +7,7 @@ import { isVerificationAdmin } from "@/lib/verification/decision";
 export async function canAccessProofFile(submissionId: string) {
   const session = await getSession();
 
-  if (!session) {
+  if (!session?.user.username) {
     return { ok: false as const, submission: null };
   }
 

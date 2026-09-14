@@ -30,13 +30,17 @@ function sessionCookieOptions(expires: Date) {
 export function toAuthUser(user: {
   id: string;
   name: string;
+  username?: string | null;
   email: string | null;
+  avatarUrl?: string | null;
   passwordHash?: string | null;
 }): AuthUser {
   return {
     id: user.id,
     name: user.name,
+    username: user.username ?? null,
     email: user.email,
+    avatarUrl: user.avatarUrl ?? null,
     hasPassword: Boolean(user.passwordHash),
   };
 }
@@ -82,7 +86,9 @@ export const getSession = cache(async (): Promise<Session | null> => {
         select: {
           id: true,
           name: true,
+          username: true,
           email: true,
+          avatarUrl: true,
           passwordHash: true,
         },
       },

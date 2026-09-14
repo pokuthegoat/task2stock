@@ -18,6 +18,7 @@ const GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo";
 const OAUTH_STATE_TTL_MS = 10 * 60 * 1000;
 
 export type GoogleProfile = {
+  sub: string;
   email: string;
   name: string;
 };
@@ -237,18 +238,20 @@ export async function readGoogleProfile(
   }
 
   const payload = (await response.json()) as {
+    sub?: unknown;
     email?: unknown;
     email_verified?: unknown;
     name?: unknown;
     given_name?: unknown;
   };
 
+  const sub = typeof payload.sub === "string" ? payload.sub.trim() : "";
   const email =
     typeof payload.email === "string" ? payload.email.trim().toLowerCase() : "";
   const verified =
     payload.email_verified === true || payload.email_verified === "true";
 
-  if (!email || !verified) {
+  if (!sub || !email || !verified) {
     return null;
   }
 
@@ -258,7 +261,7 @@ export async function readGoogleProfile(
     email.split("@")[0] ||
     "Google user";
 
-  return { email, name };
+  return { sub, email, name };
 }
 
 export function logGoogleCallback(reason: string) {

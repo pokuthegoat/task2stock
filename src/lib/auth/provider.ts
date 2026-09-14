@@ -17,7 +17,9 @@ import {
 const userSelect = {
   id: true,
   name: true,
+  username: true,
   email: true,
+  avatarUrl: true,
   passwordHash: true,
 } as const;
 
@@ -88,21 +90,59 @@ export async function signUpWithPassword(input: {
   }
 }
 
+const googleUserSelect = {
+  ...userSelect,
+  googleSub: true,
+} as const;
+
 export async function findOrCreateGoogleUser(input: {
+  sub: string;
   email: string;
   name: string;
 }): Promise<AuthResult> {
+  const googleSub = input.sub.trim();
   const email = normalizeEmail(input.email);
   const name = input.name.trim() || email.split("@")[0] || "Google user";
 
+  if (!googleSub) {
+    return toAuthUnavailableResult();
+  }
+
   try {
-    const existing = await getPrisma().user.findUnique({
-      where: { email },
-      select: userSelect,
+    const bySub = await getPrisma().user.findUnique({
+      where: { googleSub },
+      select: googleUserSelect,
     });
 
-    if (existing) {
-      return { ok: true, user: toAuthUser(existing) };
+    if (bySub) {
+      return { ok: true, user: toAuthUser(bySub) };
+    }
+
+    const byEmail = await getPrisma().user.findUnique({
+      where: { email },
+      select: googleUserSelect,
+    });
+
+    if (byEmail) {
+      if (byEmail.googleSub && byEmail.googleSub !== googleSub) {
+        return {
+          ok: false,
+          code: "EMAIL_TAKEN",
+          message: "An account with this email already exists.",
+        };
+      }
+
+      if (!byEmail.googleSub) {
+        const linked = await getPrisma().user.update({
+          where: { id: byEmail.id },
+          data: { googleSub },
+          select: googleUserSelect,
+        });
+
+        return { ok: true, user: toAuthUser(linked) };
+      }
+
+      return { ok: true, user: toAuthUser(byEmail) };
     }
 
     const created = await getPrisma().user.create({
@@ -110,17 +150,18 @@ export async function findOrCreateGoogleUser(input: {
         id: crypto.randomUUID(),
         name,
         email,
+        googleSub,
         passwordHash: null,
       },
-      select: userSelect,
+      select: googleUserSelect,
     });
 
     return { ok: true, user: toAuthUser(created) };
   } catch (error) {
     if (isDuplicateConstraintError(error)) {
       const existing = await getPrisma().user.findUnique({
-        where: { email },
-        select: userSelect,
+        where: { googleSub },
+        select: googleUserSelect,
       });
 
       if (existing) {
@@ -131,70 +172,6 @@ export async function findOrCreateGoogleUser(input: {
     logDatabaseError("googleSignIn", error);
     return toAuthUnavailableResult();
   }
-}
-
-export async function updateAccountName(input: {
-  userId: string;
-  name: string;
-}): Promise<AuthResult> {
-  const name = input.name.trim();
-  const user = await getPrisma().user.findUnique({
-    where: { id: input.userId },
-    select: userSelect,
-  });
-
-  if (!user) {
-    return {
-      ok: false,
-      code: "INVALID_CREDENTIALS",
-      message: "Sign in to manage your account.",
-    };
-  }
-
-  const updated = await getPrisma().user.update({
-    where: { id: user.id },
-    data: { name },
-    select: userSelect,
-  });
-
-  return { ok: true, user: toAuthUser(updated) };
-}
-
-export async function changeAccountPassword(input: {
-  userId: string;
-  currentPassword: string;
-  newPassword: string;
-}): Promise<AuthResult> {
-  const user = await getPrisma().user.findUnique({
-    where: { id: input.userId },
-    select: userSelect,
-  });
-
-  if (!user) {
-    return {
-      ok: false,
-      code: "INVALID_CREDENTIALS",
-      message: "Sign in to manage your account.",
-    };
-  }
-
-  if (
-    !user.passwordHash ||
-    !(await verifyPassword(input.currentPassword, user.passwordHash))
-  ) {
-    return {
-      ok: false,
-      code: "INVALID_CREDENTIALS",
-      message: "Current password is incorrect.",
-    };
-  }
-
-  await getPrisma().user.update({
-    where: { id: user.id },
-    data: { passwordHash: await hashPassword(input.newPassword) },
-  });
-
-  return { ok: true, user: toAuthUser(user) };
 }
 
 export async function signOut(): Promise<void> {

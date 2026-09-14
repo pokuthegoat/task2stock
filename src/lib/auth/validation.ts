@@ -4,6 +4,46 @@ export function validateName(value: string): string | undefined {
   const name = value.trim();
   if (!name) return "Enter your name.";
   if (name.length < 2) return "Name must be at least 2 characters.";
+  if (name.length > 40) return "Name must be at most 40 characters.";
+  return undefined;
+}
+
+export function normalizeUsername(value: string) {
+  return value.trim().toLowerCase();
+}
+
+export function validateUsername(value: string): string | undefined {
+  const username = normalizeUsername(value);
+
+  if (!username) return "Enter a username.";
+  if (username.length < 3) return "Username must be at least 3 characters.";
+  if (username.length > 20) return "Username must be at most 20 characters.";
+  if (!/^[a-z][a-z0-9_]*$/.test(username)) {
+    return "Use a letter, then letters, numbers, or underscores.";
+  }
+
+  return undefined;
+}
+
+export function validateDisplayName(value: string): string | undefined {
+  return validateName(value);
+}
+
+export function validateAvatarUrl(value: string): string | undefined {
+  const url = value.trim();
+
+  if (!url) return undefined;
+  if (url.length > 500) return "Image URL must be at most 500 characters.";
+
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:") {
+      return "Use an https image URL.";
+    }
+  } catch {
+    return "Enter a valid image URL.";
+  }
+
   return undefined;
 }
 
@@ -50,9 +90,13 @@ export function validatePasswordChange(input: {
   currentPassword: string;
   password: string;
   confirmPassword: string;
+  requireCurrent?: boolean;
 }): FieldErrors {
   return {
-    currentPassword: validateCurrentPassword(input.currentPassword),
+    currentPassword:
+      input.requireCurrent === false
+        ? undefined
+        : validateCurrentPassword(input.currentPassword),
     password: validatePassword(input.password),
     confirmPassword: validatePasswordConfirm(
       input.password,

@@ -6,7 +6,7 @@ import { readContactEmail } from "@/lib/contact";
 
 export const metadata: Metadata = {
   title: "Contact — Task2Stock",
-  description: "Contact Task2Stock about the product, catalog, or your account.",
+  description: "Contact Task2Stock about the product, catalog, or your profile.",
 };
 
 export default function ContactPage() {

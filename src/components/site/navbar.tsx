@@ -14,12 +14,14 @@ export function Navbar() {
   const { user, signOut } = useAuth();
 
   const links = user
-    ? [
-        { href: "/tasks", label: "Tasks" },
-        { href: "/work", label: "My Work" },
-        { href: "/portfolio", label: "Portfolio" },
-        { href: "/account", label: "Account" },
-      ]
+    ? user.username
+      ? [
+          { href: "/tasks", label: "Tasks" },
+          { href: "/work", label: "My Work" },
+          { href: "/portfolio", label: "Portfolio" },
+          { href: "/profile", label: "Profile" },
+        ]
+      : []
     : [
         { href: "/tasks", label: "Tasks" },
         { href: "/#how-it-works", label: "How it works" },

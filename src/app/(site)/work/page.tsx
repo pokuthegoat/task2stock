@@ -28,7 +28,7 @@ export default async function WorkPage() {
         <PageContainer>
           <SectionHeading
             as="h1"
-            eyebrow="Account"
+            eyebrow="Work"
             title="My Work"
             description="Every task you have started, with its current status."
           />

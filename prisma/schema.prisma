@@ -13,11 +13,22 @@ datasource db {
 model User {
   id            String   @id
   name          String
+  /// Unique handle. Null until first-time profile setup.
+  username      String?  @unique
   email         String?  @unique
+  /// Google OIDC subject. Stable identity for Google sign-in. Null for email/password-only users.
+  googleSub     String?  @unique
   /// scrypt hash for email/password accounts. Null for Google-only users.
   passwordHash  String?
+  avatarUrl     String?
   /// Unused by current auth. Kept to preserve existing rows.
   walletAddress String?  @unique
+  /// Set when username is first saved and on each later username change.
+  usernameChangedAt DateTime?
+  /// Set only after a successful email change. Null means the first change is open.
+  emailChangedAt    DateTime?
+  /// Set only after a successful password change. Null means the first change is open.
+  passwordChangedAt DateTime?
   createdAt     DateTime @default(now())
 
   sessions AuthSession[]

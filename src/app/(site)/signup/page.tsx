@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AuthShell } from "@/components/auth/auth-shell";
-import { LoginForm } from "@/components/auth/login-form";
+import { SignupForm } from "@/components/auth/signup-form";
+import { afterAuthPath } from "@/lib/auth/profile-gate";
 import { getSession } from "@/lib/auth/session";
 import { googleAuthErrorMessage } from "@/lib/auth/validation";
 
 export const metadata: Metadata = {
-  title: "Sign in — Task2Stock",
-  description: "Sign in to Task2Stock with Google or email and password.",
+  title: "Create account — Task2Stock",
+  description:
+    "Create a Task2Stock account with Google or email and password.",
 };
 
-export default async function LoginPage({
+export default async function SignupPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string }>;
@@ -18,7 +20,7 @@ export default async function LoginPage({
   const session = await getSession();
 
   if (session) {
-    redirect("/tasks");
+    redirect(afterAuthPath(session.user));
   }
 
   const { error } = await searchParams;
@@ -27,11 +29,11 @@ export default async function LoginPage({
     <main id="main" className="section-base flex-1">
       <section className="pb-20 pt-16 md:pb-28 md:pt-24">
         <AuthShell
-          eyebrow="Account"
-          title="Welcome back"
-          description="Continue with Google or sign in with your email and password."
+          eyebrow="Welcome"
+          title="Create your account"
+          description="Continue with Google or create an account with email and password."
         >
-          <LoginForm notice={googleAuthErrorMessage(error)} />
+          <SignupForm notice={googleAuthErrorMessage(error)} />
         </AuthShell>
       </section>
     </main>
