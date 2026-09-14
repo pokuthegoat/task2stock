@@ -25,7 +25,7 @@ export function Why() {
           <SectionHeading
             eyebrow="Why Task2Stock"
             title="Work that is meant to become ownership."
-            description="The idea is simple. Do the task. Earn a stock-oriented reward. No return promises, and no live market claims."
+            description="The idea is simple. Do the task. Earn a stock-oriented reward."
           />
         </Reveal>
         <ol className="mt-14 grid gap-10 md:grid-cols-3 md:gap-8">

@@ -12,7 +12,7 @@ export function RewardPreview({ items }: { items: HomeRewardPreview[] }) {
         <Reveal>
           <SectionHeading
             eyebrow="Rewards"
-            title="Work, then a stock ticker."
+            title="Work, and earn stocks."
             description="These amounts and tickers are the catalog RewardOffer on each task. Settlement is not live."
           />
         </Reveal>
