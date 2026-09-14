@@ -1,19 +1,37 @@
 import "server-only";
 
+import { createBlobStorage, isProofBlobConfigured } from "@/lib/storage/blob";
+import { isProfileBlobConfigured } from "@/lib/storage/blob-env";
 import { createLocalStorage } from "@/lib/storage/local";
-import { createS3Storage } from "@/lib/storage/s3";
 import type { StorageProvider } from "@/lib/storage/types";
 
-let cached: StorageProvider | null = null;
+let proofCached: StorageProvider | null = null;
+let profileCached: StorageProvider | null = null;
 
-export function getStorageProvider(): StorageProvider {
-  if (cached) {
-    return cached;
+export function getProofStorageProvider(): StorageProvider {
+  if (proofCached) {
+    return proofCached;
   }
 
-  const driver = (process.env.STORAGE_DRIVER ?? "local").trim().toLowerCase();
-  cached = driver === "s3" ? createS3Storage() : createLocalStorage();
-  return cached;
+  proofCached = isProofBlobConfigured()
+    ? createBlobStorage("proof")
+    : createLocalStorage();
+  return proofCached;
+}
+
+export function getProfileStorageProvider(): StorageProvider {
+  if (profileCached) {
+    return profileCached;
+  }
+
+  profileCached = isProfileBlobConfigured()
+    ? createBlobStorage("profile")
+    : createLocalStorage();
+  return profileCached;
+}
+
+export function getStorageProvider(): StorageProvider {
+  return getProofStorageProvider();
 }
 
 export function proofStorageKey(input: {
@@ -23,4 +41,9 @@ export function proofStorageKey(input: {
 }) {
   const safe = input.fileName.replace(/[^a-zA-Z0-9._-]+/g, "-").slice(0, 80);
   return `proofs/${input.userId}/${input.submissionId}/${safe || "proof"}`;
+}
+
+export function avatarStorageKey(input: { userId: string; fileName: string }) {
+  const safe = input.fileName.replace(/[^a-zA-Z0-9._-]+/g, "-").slice(0, 80);
+  return `avatars/${input.userId}/${safe || "avatar"}`;
 }

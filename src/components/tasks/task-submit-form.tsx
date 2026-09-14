@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { PROOF_MAX_BYTES } from "@/lib/proof/types";
 
 type TaskSubmitFormProps = {
@@ -7,11 +8,8 @@ type TaskSubmitFormProps = {
   error?: string;
   pending?: boolean;
   selectedFile: File | null;
-  existingFileName?: string | null;
-  existingFileSize?: number | null;
   onDetailsChange: (value: string) => void;
   onFileChange: (file: File | null) => void;
-  onRemoveExistingFile: () => void;
   onSubmit: () => void;
 };
 
@@ -26,16 +24,10 @@ export function TaskSubmitForm({
   error,
   pending = false,
   selectedFile,
-  existingFileName,
-  existingFileSize,
   onDetailsChange,
   onFileChange,
-  onRemoveExistingFile,
   onSubmit,
 }: TaskSubmitFormProps) {
-  const shownName = selectedFile?.name ?? existingFileName;
-  const shownSize = selectedFile?.size ?? existingFileSize ?? null;
-
   return (
     <form
       noValidate
@@ -46,42 +38,7 @@ export function TaskSubmitForm({
       }}
     >
       <div>
-        <label htmlFor="proof-details" className="label">
-          What you completed
-        </label>
-        <textarea
-          id="proof-details"
-          name="details"
-          rows={6}
-          value={details}
-          onChange={(event) => onDetailsChange(event.target.value)}
-          aria-invalid={Boolean(error)}
-          aria-describedby={error ? "proof-details-error" : "proof-details-hint"}
-          placeholder="Describe the work you completed. Optional if you attach a file."
-          className={`field-textarea mt-2 ${
-            error ? "border-[#c9a9a2]/50" : ""
-          }`}
-        />
-        {error ? (
-          <p
-            id="proof-details-error"
-            role="alert"
-            className="mt-2 text-xs text-[#d4b4ae]"
-          >
-            {error}
-          </p>
-        ) : (
-          <p
-            id="proof-details-hint"
-            className="mt-2 text-xs leading-5 text-foreground/38"
-          >
-            A note, a file, or both. Empty submissions are not accepted.
-          </p>
-        )}
-      </div>
-
-      <div>
-        <p className="label">Proof file</p>
+        <p className="label">Upload proof file</p>
         <label
           className="mt-2 flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-[22px] border border-dashed border-white/16 bg-white/[0.03] px-5 py-8 text-center transition-colors hover:bg-white/[0.05]"
           onDragOver={(event) => {
@@ -104,40 +61,71 @@ export function TaskSubmitForm({
               event.target.value = "";
             }}
           />
-          <p className="text-sm font-medium text-foreground/80">
-            Drop a file here or click to select
-          </p>
+          <p className="text-sm font-medium text-foreground/80">Choose file</p>
           <p className="mt-2 text-xs leading-5 text-foreground/40">
             PNG, JPEG, WEBP, or PDF. Up to {formatSize(PROOF_MAX_BYTES)}.
           </p>
         </label>
 
-        {shownName ? (
+        {selectedFile ? (
           <div className="mt-4 flex items-center justify-between gap-4 border-t border-white/8 pt-4">
             <div>
-              <p className="text-sm font-medium text-foreground">{shownName}</p>
-              {shownSize != null ? (
-                <p className="mt-1 text-xs text-foreground/40">
-                  {formatSize(shownSize)}
-                </p>
-              ) : null}
+              <p className="text-sm font-medium text-foreground">
+                {selectedFile.name}
+              </p>
+              <p className="mt-1 text-xs text-foreground/40">
+                {formatSize(selectedFile.size)}
+              </p>
             </div>
             <button
               type="button"
               className="text-sm font-medium text-foreground/55 hover:text-foreground"
-              onClick={() => {
-                if (selectedFile) {
-                  onFileChange(null);
-                  return;
-                }
-                onRemoveExistingFile();
-              }}
+              onClick={() => onFileChange(null)}
             >
               Remove
             </button>
           </div>
         ) : null}
       </div>
+
+      <div>
+        <label htmlFor="proof-details" className="label">
+          Proof description
+        </label>
+        <textarea
+          id="proof-details"
+          name="details"
+          rows={6}
+          value={details}
+          onChange={(event) => onDetailsChange(event.target.value)}
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? "proof-details-error" : "proof-details-hint"}
+          placeholder="Describe the work you completed and how this file proves it."
+          className={`field-textarea mt-2 ${
+            error ? "border-[#c9a9a2]/50" : ""
+          }`}
+        />
+        {error ? (
+          <p
+            id="proof-details-error"
+            role="alert"
+            className="mt-2 text-xs text-[#d4b4ae]"
+          >
+            {error}
+          </p>
+        ) : (
+          <p
+            id="proof-details-hint"
+            className="mt-2 text-xs leading-5 text-foreground/38"
+          >
+            A moderator will review this description with your file.
+          </p>
+        )}
+      </div>
+
+      <Button type="submit" className="w-full" disabled={pending}>
+        {pending ? "Saving…" : "Verify"}
+      </Button>
     </form>
   );
 }

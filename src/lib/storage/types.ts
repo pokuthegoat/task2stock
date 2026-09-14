@@ -9,7 +9,7 @@ export interface StorageProvider {
     key: string;
     bytes: Uint8Array;
     contentType: string;
-  }): Promise<void>;
+  }): Promise<string>;
   get(key: string): Promise<StoredObject | null>;
   delete(key: string): Promise<void>;
 }

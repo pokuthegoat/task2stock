@@ -14,7 +14,7 @@ export type WorkStatus =
 
 export const workStatusLabels: Record<WorkStatus, string> = {
   in_progress: "In progress",
-  proof_submitted: "Proof submitted",
+  proof_submitted: "Payout pending",
   verified: "Verified",
   reward_issued: "Reward issued",
 };

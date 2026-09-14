@@ -6,58 +6,77 @@ import { submitProofAction } from "@/app/actions/task-progress";
 import { TaskSubmitForm } from "@/components/tasks/task-submit-form";
 import { TaskSubmitProgress } from "@/components/tasks/task-submit-progress";
 import { TaskSubmitStatus } from "@/components/tasks/task-submit-status";
-import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/ui/page-container";
 import { formatRewardOffer, formatUsdCompact, type TaskView } from "@/lib/data";
+import { useAuth } from "@/components/auth/auth-provider";
+import { getProofInputError } from "@/lib/proof/input";
 import { isAllowedProofFileName, PROOF_MAX_BYTES } from "@/lib/proof/types";
+import { uploadProofBlob } from "@/lib/storage/client-upload";
 
 export function TaskSubmit({
   task,
   initialDetails,
   initialFile,
+  submittedAt,
   submitted: initialSubmitted,
-  verified = false,
-  issued = false,
-  issuedReward = null,
 }: {
   task: TaskView;
   initialDetails: string;
   initialFile?: { fileName: string; size: number; href: string } | null;
+  submittedAt?: string | null;
   submitted: boolean;
-  verified?: boolean;
-  issued?: boolean;
-  issuedReward?: { amountCents: number; ticker: string } | null;
 }) {
+  const { user } = useAuth();
   const [details, setDetails] = useState(initialDetails);
   const [file, setFile] = useState<File | null>(null);
   const [existingFile, setExistingFile] = useState(initialFile ?? null);
-  const [removeExisting, setRemoveExisting] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [submitted, setSubmitted] = useState(initialSubmitted);
   const [pending, setPending] = useState(false);
-  const [status, setStatus] = useState<string | undefined>();
+  const [savedAt, setSavedAt] = useState(submittedAt ?? null);
 
   async function submit() {
-    if (pending) return;
+    if (pending || submitted) return;
 
-    const hasNote = Boolean(details.trim());
-    const hasFile = Boolean(file) || (Boolean(existingFile) && !removeExisting);
+    const inputError = getProofInputError({
+      details,
+      hasFile: Boolean(file),
+    });
 
-    if (!hasNote && !hasFile) {
-      setError("Add a note or attach a PNG, JPEG, WEBP, or PDF file.");
+    if (inputError) {
+      setError(inputError);
+      return;
+    }
+
+    if (file && file.size > PROOF_MAX_BYTES) {
+      setError("Files must be 10 MB or smaller.");
+      return;
+    }
+
+    if (file && !isAllowedProofFileName(file.name)) {
+      setError("Use a PNG, JPEG, WEBP, or PDF file.");
       return;
     }
 
     setError(undefined);
     setPending(true);
-    setStatus("Saving proof…");
 
     try {
       const data = new FormData();
       data.set("taskId", task.id);
       data.set("details", details);
-      if (file) data.set("file", file);
-      if (removeExisting && !file) data.set("removeFile", "1");
+
+      if (file && user?.id) {
+        try {
+          const blob = await uploadProofBlob(user.id, file);
+          data.set("blobUrl", blob.url);
+          data.set("fileName", file.name);
+        } catch {
+          data.set("file", file);
+        }
+      } else if (file) {
+        data.set("file", file);
+      }
 
       const result = await submitProofAction(data);
 
@@ -67,13 +86,18 @@ export function TaskSubmit({
           return;
         }
 
+        if ("code" in result && result.code === "ALREADY_SUBMITTED") {
+          setSubmitted(true);
+          setSavedAt(savedAt ?? new Date().toISOString());
+          return;
+        }
+
         setError(result.error);
-        setStatus(undefined);
         return;
       }
 
       setSubmitted(true);
-      setStatus("Proof submitted.");
+      setSavedAt(new Date().toISOString());
       if (file) {
         setExistingFile({
           fileName: file.name,
@@ -81,8 +105,9 @@ export function TaskSubmit({
           href: `/api/proofs/${result.submissionId}`,
         });
         setFile(null);
-        setRemoveExisting(false);
       }
+    } catch {
+      setError("Unable to save your proof. Try again.");
     } finally {
       setPending(false);
     }
@@ -102,7 +127,7 @@ export function TaskSubmit({
           <p className="label">{task.company.name}</p>
 
           <h1 className="display mt-4 text-4xl text-foreground md:text-5xl">
-            {task.title}
+            {submitted ? "Payout pending" : "Proof"}
           </h1>
 
           <p className="mt-5 font-mono text-lg tracking-tight text-accent">
@@ -110,39 +135,31 @@ export function TaskSubmit({
           </p>
 
           <p className="mt-6 max-w-xl text-lg leading-8 text-foreground/58">
-            Proof is required before a reward can be issued. Verification stays
-            a manual operator step.
+            {submitted
+              ? "Your submission is waiting on moderator review."
+              : "Upload a proof file and describe the work. A moderator will review both before any reward is processed."}
           </p>
 
           <section className="mt-12">
-            <TaskSubmitProgress
-              submitted={submitted}
-              verified={verified}
-              issued={issued}
-            />
+            <TaskSubmitProgress submitted={submitted} />
           </section>
 
           {submitted ? (
             <div className="mt-14">
               <TaskSubmitStatus
+                taskTitle={task.title}
+                reward={task.reward}
+                submittedAt={savedAt}
                 details={details.trim()}
                 file={existingFile}
-                verified={verified}
-                issued={issued}
-                issuedLabel={
-                  issuedReward
-                    ? formatRewardOffer(issuedReward)
-                    : undefined
-                }
               />
             </div>
           ) : (
             <section className="mt-14">
-              <h2 className="heading text-3xl text-foreground">
-                Submit proof
-              </h2>
+              <h2 className="heading text-3xl text-foreground">Proof</h2>
               <p className="mt-3 max-w-xl text-sm leading-6 text-foreground/52">
-                {task.requirement} Add a short note, attach a file, or both.
+                {task.requirement} Include a file and a description. Both are
+                required.
               </p>
               <div className="mt-8">
                 <TaskSubmitForm
@@ -150,12 +167,6 @@ export function TaskSubmit({
                   error={error}
                   pending={pending}
                   selectedFile={file}
-                  existingFileName={
-                    removeExisting ? null : existingFile?.fileName
-                  }
-                  existingFileSize={
-                    removeExisting ? null : existingFile?.size
-                  }
                   onDetailsChange={(value) => {
                     setDetails(value);
                     if (error) setError(undefined);
@@ -170,93 +181,46 @@ export function TaskSubmit({
                       return;
                     }
                     setFile(next);
-                    setRemoveExisting(false);
                     if (error) setError(undefined);
-                  }}
-                  onRemoveExistingFile={() => {
-                    setExistingFile(null);
-                    setRemoveExisting(true);
                   }}
                   onSubmit={submit}
                 />
               </div>
-              {status ? (
-                <p className="mt-4 text-sm text-foreground/55">{status}</p>
-              ) : null}
             </section>
           )}
         </div>
 
         <aside className="lg:sticky lg:top-28">
           <div className="border-t border-white/8 pt-6">
-            <p className="label">{issued ? "Issued reward" : "Reward"}</p>
+            <p className="label">Reward</p>
             <p className="stat-value mt-3 text-4xl text-foreground">
-              {formatUsdCompact(
-                issuedReward?.amountCents ?? task.reward.amountCents,
-              )}
+              {formatUsdCompact(task.reward.amountCents)}
             </p>
             <p className="mt-1 font-mono text-sm text-accent">
-              {issuedReward?.ticker ?? task.reward.ticker}
+              {task.reward.ticker}
             </p>
 
             <dl className="mt-8 space-y-4 border-t border-white/8 pt-5 text-sm">
               <div className="flex justify-between gap-4">
                 <dt className="text-foreground/40">Status</dt>
                 <dd className="text-right text-foreground/80">
-                  {issued
-                    ? "Issued"
-                    : verified
-                      ? "Verified"
-                      : submitted
-                        ? "Pending verification"
-                        : "Completed"}
+                  {submitted ? "Payout pending" : "Proof required"}
                 </dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-foreground/40">Verification</dt>
-                <dd className="text-right text-foreground/80">
-                  {verified ? "Verified" : "Manual"}
-                </dd>
+                <dt className="text-foreground/40">Review</dt>
+                <dd className="text-right text-foreground/80">Moderator</dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-foreground/40">Reward</dt>
-                <dd className="text-right text-foreground/80">
-                  {issued
-                    ? "Issued"
-                    : verified
-                      ? "Pending issuance"
-                      : "Not issued"}
-                </dd>
+                <dd className="text-right text-foreground/80">Not issued</dd>
               </div>
             </dl>
 
-            <div className="mt-8">
-              {submitted ? (
-                <p className="text-xs leading-5 text-foreground/38">
-                  {issued
-                    ? "Issued. No holding was created."
-                    : verified
-                      ? "Verified. Reward is pending issuance."
-                      : "Pending verification. No reward is issued, and Portfolio is unchanged."}
-                </p>
-              ) : (
-                <>
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={pending}
-                    onClick={() => {
-                      void submit();
-                    }}
-                  >
-                    {pending ? "Saving…" : "Submit for verification"}
-                  </Button>
-                  <p className="mt-3 text-center text-xs leading-5 text-foreground/38">
-                    Submitting does not start a review or issue stock.
-                  </p>
-                </>
-              )}
-            </div>
+            <p className="mt-8 text-xs leading-5 text-foreground/38">
+              Verify sends this proof for moderator review. It does not approve
+              the task or issue stock.
+            </p>
           </div>
         </aside>
       </div>

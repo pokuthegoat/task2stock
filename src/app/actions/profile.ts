@@ -24,6 +24,11 @@ import {
   validatePasswordChange,
   validateUsername,
 } from "@/lib/auth/validation";
+import { inspectOwnedBlob } from "@/lib/storage/blob";
+import {
+  blobUrlAccess,
+  isProfileBlobConfigured,
+} from "@/lib/storage/blob-env";
 
 function readField(formData: FormData, key: string) {
   return String(formData.get(key) ?? "");
@@ -161,9 +166,38 @@ export async function updateAvatarUrlAction(
     return { ok: false, errors, message: null };
   }
 
+  const trimmed = avatarUrl.trim();
+
+  if (
+    trimmed &&
+    blobUrlAccess(trimmed) === "public" &&
+    isProfileBlobConfigured()
+  ) {
+    const owned = await inspectOwnedBlob({
+      userId: session.user.id,
+      url: trimmed,
+      kind: "avatar",
+    });
+
+    if (!owned) {
+      return {
+        ok: false,
+        errors: {
+          avatarUrl: "Unable to save that image.",
+        },
+        message: null,
+      };
+    }
+
+    return fromResult(
+      await updateAvatarUrl({ userId: session.user.id, avatarUrl: owned.url }),
+      "Profile picture updated.",
+    );
+  }
+
   return fromResult(
     await updateAvatarUrl({ userId: session.user.id, avatarUrl }),
-    avatarUrl.trim() ? "Profile picture updated." : "Profile picture removed.",
+    trimmed ? "Profile picture updated." : "Profile picture removed.",
   );
 }
 

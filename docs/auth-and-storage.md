@@ -65,29 +65,40 @@ GOOGLE_CLIENT_SECRET=
 
 Apply existing `prisma/migrations` to the Turso database before production signup. Catalog reads can still use fixtures (`DATA_SOURCE` unset). Auth needs the migrated `User` and `AuthSession` tables.
 
-## Proof file storage
+## Proof and profile picture storage
 
-Proof files are not stored in SQLite. Metadata lives on `ProofSubmission`. Bytes go through `src/lib/storage/provider.ts`.
+Files are not stored in SQLite. Metadata lives on `ProofSubmission` / `User.avatarUrl`. Bytes go through two separate Vercel Blob stores.
 
-Local development (default):
+Local development without proof Blob credentials writes proof files to:
 
 ```
-STORAGE_DRIVER=local
 STORAGE_LOCAL_DIR=.data/proofs
 ```
 
-Production object storage:
+### Private proofs — `task2stock-proofs`
+
+Access: private. Environment variables created by the Vercel connection:
 
 ```
-STORAGE_DRIVER=s3
-S3_BUCKET=
-S3_REGION=
-S3_ACCESS_KEY_ID=
-S3_SECRET_ACCESS_KEY=
-S3_ENDPOINT=
-S3_FORCE_PATH_STYLE=true
+BLOB_READ_WRITE_TOKEN=
+BLOB_STORE_ID=
+BLOB_WEBHOOK_PUBLIC_KEY=
 ```
 
-`S3_ENDPOINT` and `S3_FORCE_PATH_STYLE` are for S3-compatible hosts (R2, MinIO). Leave them unset for AWS S3.
+Proof files upload with `access: "private"` using those credentials only. The app never shows the private Blob URL. Owners and verification admins read files at `/api/proofs/[submissionId]`.
 
-Owners can read their own files at `/api/proofs/[submissionId]`. Verification admins on `VERIFICATION_ADMIN_USER_IDS` can also read them. Upload does not verify proof.
+### Public profile pictures — `task2stock-profiles`
+
+Access: public. Environment variables created by the Vercel connection (prefix `PROFILES`):
+
+```
+PROFILES_READ_WRITE_TOKEN=
+PROFILES_STORE_ID=
+PROFILES_WEBHOOK_PUBLIC_KEY=
+```
+
+Profile pictures upload with `access: "public"` using those credentials only. The public Blob URL is saved on `User.avatarUrl` and displayed directly.
+
+Do not put any Blob token in client code or prefix it with `NEXT_PUBLIC_`. Pull local copies with `npx vercel env pull .env.local`.
+
+Upload does not verify proof. Proof files and profile pictures must not share a store.

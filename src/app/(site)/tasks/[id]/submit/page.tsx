@@ -53,9 +53,13 @@ export default async function TaskSubmitPage({
 
   const progress = await getTaskProgress(session.user.id, task.id);
   const submitted = Boolean(progress.submission);
-  const verified = progress.verification?.status === "verified";
-  const issuedReward =
-    progress.reward?.status === "issued" ? progress.reward : null;
+  const complete =
+    progress.attempt?.status === "marked_complete" ||
+    Boolean(progress.completion);
+
+  if (!submitted && !complete) {
+    redirect(`/tasks/${task.id}/run`);
+  }
 
   return (
     <main id="main" className="section-base flex-1">
@@ -71,17 +75,8 @@ export default async function TaskSubmitPage({
               }
             : null
         }
+        submittedAt={progress.submission?.submittedAt ?? null}
         submitted={submitted}
-        verified={verified}
-        issued={Boolean(issuedReward)}
-        issuedReward={
-          issuedReward
-            ? {
-                amountCents: issuedReward.amountCents,
-                ticker: issuedReward.ticker,
-              }
-            : null
-        }
       />
     </main>
   );

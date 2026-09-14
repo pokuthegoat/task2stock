@@ -51,6 +51,10 @@ async function main() {
     });
   }
 
+  await prisma.taskLine.deleteMany({
+    where: { body: "Example listing only — not a live offer." },
+  });
+
   const counts = {
     companies: await prisma.company.count(),
     tasks: await prisma.task.count(),

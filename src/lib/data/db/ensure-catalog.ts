@@ -84,5 +84,12 @@ export async function ensureCatalogTask(taskId: TaskId): Promise<boolean> {
     });
   }
 
+  await prisma.taskLine.deleteMany({
+    where: {
+      taskId: task.id,
+      body: "Example listing only — not a live offer.",
+    },
+  });
+
   return true;
 }

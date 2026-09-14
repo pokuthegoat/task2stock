@@ -101,6 +101,7 @@ export async function markAttemptCompleteAction(taskId: TaskId) {
 export async function submitProofAction(formData: FormData) {
   const taskId = String(formData.get("taskId") ?? "") as TaskId;
   const details = String(formData.get("details") ?? "");
+  const blobUrl = String(formData.get("blobUrl") ?? "");
   const removeFile = String(formData.get("removeFile") ?? "") === "1";
   const uploaded = formData.get("file");
   const file = uploaded instanceof File ? uploaded : null;
@@ -121,6 +122,7 @@ export async function submitProofAction(formData: FormData) {
       taskId,
       details,
       file,
+      blobUrl: blobUrl || null,
       removeFile,
     });
 

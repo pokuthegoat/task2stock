@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { canAccessProofFile } from "@/lib/proof/access";
-import { getStorageProvider } from "@/lib/storage/provider";
+import { getProofStorageProvider } from "@/lib/storage/provider";
 
 export async function GET(
   _request: Request,
@@ -13,7 +13,9 @@ export async function GET(
     return NextResponse.json({ error: "Not found." }, { status: 404 });
   }
 
-  const stored = await getStorageProvider().get(access.submission.file.storageKey);
+  const stored = await getProofStorageProvider().get(
+    access.submission.file.storageKey,
+  );
 
   if (!stored) {
     return NextResponse.json({ error: "Not found." }, { status: 404 });

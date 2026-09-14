@@ -26,6 +26,7 @@ export function createLocalStorage(): StorageProvider {
       const full = resolveKey(input.key);
       await mkdir(path.dirname(full), { recursive: true });
       await writeFile(full, Buffer.from(input.bytes));
+      return input.key;
     },
 
     async get(key): Promise<StoredObject | null> {

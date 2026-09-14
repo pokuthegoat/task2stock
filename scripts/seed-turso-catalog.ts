@@ -107,6 +107,10 @@ async function main() {
       });
     }
 
+    await prisma.taskLine.deleteMany({
+      where: { body: "Example listing only — not a live offer." },
+    });
+
     console.log("Turso catalog seed complete:", {
       companies: await prisma.company.count(),
       tasks: await prisma.task.count(),

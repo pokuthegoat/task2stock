@@ -99,7 +99,7 @@ function main() {
 
   if (
     workStatusLabels.in_progress !== "In progress" ||
-    workStatusLabels.proof_submitted !== "Proof submitted" ||
+    workStatusLabels.proof_submitted !== "Payout pending" ||
     workStatusLabels.verified !== "Verified" ||
     workStatusLabels.reward_issued !== "Reward issued"
   ) {

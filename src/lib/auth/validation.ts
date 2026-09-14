@@ -40,6 +40,11 @@ export function validateAvatarUrl(value: string): string | undefined {
     if (parsed.protocol !== "https:") {
       return "Use an https image URL.";
     }
+    if (
+      parsed.hostname.toLowerCase().endsWith(".private.blob.vercel-storage.com")
+    ) {
+      return "Proof files cannot be used as a profile picture.";
+    }
   } catch {
     return "Enter a valid image URL.";
   }

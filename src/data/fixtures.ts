@@ -73,7 +73,6 @@ const taskSeeds: TaskSeed[] = [
     eligibility: [
       "Able to run outdoors for the full distance.",
       "Can keep a basic written or photo log.",
-      "Example listing only — not a live offer.",
     ],
   },
   {
@@ -102,7 +101,6 @@ const taskSeeds: TaskSeed[] = [
     eligibility: [
       "Access to a camera or phone that can record video.",
       "Able to edit a short clip.",
-      "Example listing only — not a live offer.",
     ],
   },
   {
@@ -131,7 +129,6 @@ const taskSeeds: TaskSeed[] = [
     eligibility: [
       "Able to organize a small local or online campaign.",
       "Can write a concise recap.",
-      "Example listing only — not a live offer.",
     ],
   },
   {
@@ -160,7 +157,6 @@ const taskSeeds: TaskSeed[] = [
     eligibility: [
       "Able to visit a store in person.",
       "Can take and share still photographs.",
-      "Example listing only — not a live offer.",
     ],
   },
   {
@@ -189,7 +185,6 @@ const taskSeeds: TaskSeed[] = [
     eligibility: [
       "Access to a quiet room and a recording device.",
       "Comfortable writing a short recap.",
-      "Example listing only — not a live offer.",
     ],
   },
   {
@@ -220,7 +215,6 @@ const taskSeeds: TaskSeed[] = [
     eligibility: [
       "Able to host a small in-person or local gathering.",
       "Can document the session with photos and a written recap.",
-      "Example listing only — not a live offer.",
     ],
   },
   {
@@ -250,7 +244,6 @@ const taskSeeds: TaskSeed[] = [
     eligibility: [
       "Access to a bicycle and a safe route.",
       "Able to record a basic GPS trace.",
-      "Example listing only — not a live offer.",
     ],
   },
   {
@@ -279,7 +272,6 @@ const taskSeeds: TaskSeed[] = [
     eligibility: [
       "Able to complete one in-store visit.",
       "Can caption photographs clearly.",
-      "Example listing only — not a live offer.",
     ],
   },
 ];

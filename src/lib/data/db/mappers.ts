@@ -221,7 +221,10 @@ export function toTaskView(
       .map((line) => line.body),
     eligibility: lines
       .filter((line) => line.kind === "eligibility")
-      .map((line) => line.body),
+      .map((line) => line.body)
+      .filter(
+        (body) => body !== "Example listing only — not a live offer.",
+      ),
   };
 }
 

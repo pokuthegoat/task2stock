@@ -4,6 +4,7 @@ import type { Prisma } from "@prisma/client";
 import { getPrisma } from "@/lib/data/db/client";
 import { ensureCatalogTask } from "@/lib/data/db/ensure-catalog";
 import {
+  isDuplicateConstraintError,
   isForeignKeyConstraintError,
   logDatabaseError,
 } from "@/lib/data/db/errors";
@@ -304,59 +305,54 @@ export async function submitProof(
     include: { verification: true },
   });
 
-  const fileData =
-    input.file === undefined
-      ? {}
-      : input.file
-        ? {
-            fileName: input.file.fileName,
-            fileContentType: input.file.contentType,
-            fileSize: input.file.size,
-            fileStorageKey: input.file.storageKey,
-          }
-        : {
-            fileName: null,
-            fileContentType: null,
-            fileSize: null,
-            fileStorageKey: null,
-          };
-
   if (existing) {
-    if (existing.verification?.status === "verified") {
-      return toSubmission(existing);
-    }
+    return toSubmission(existing);
+  }
 
-    const updated = await getPrisma().proofSubmission.update({
-      where: { id: existing.id },
+  const fileData = input.file
+    ? {
+        fileName: input.file.fileName,
+        fileContentType: input.file.contentType,
+        fileSize: input.file.size,
+        fileStorageKey: input.file.storageKey,
+      }
+    : {};
+
+  const submittedAt = new Date();
+
+  try {
+    const created = await getPrisma().proofSubmission.create({
       data: {
+        id: input.id ?? crypto.randomUUID(),
+        completionId: completion.id,
+        userId,
+        taskId,
         details: input.details,
+        submittedAt,
         ...fileData,
+        verification: {
+          create: {
+            status: "submitted",
+            updatedAt: submittedAt,
+          },
+        },
       },
     });
 
-    return toSubmission(updated);
+    return toSubmission(created);
+  } catch (error) {
+    if (isDuplicateConstraintError(error)) {
+      const raced = await getPrisma().proofSubmission.findUnique({
+        where: { completionId: completion.id },
+      });
+
+      if (raced) {
+        return toSubmission(raced);
+      }
+    }
+
+    throw error;
   }
-
-  const submittedAt = new Date();
-  const created = await getPrisma().proofSubmission.create({
-    data: {
-      id: input.id ?? crypto.randomUUID(),
-      completionId: completion.id,
-      userId,
-      taskId,
-      details: input.details,
-      submittedAt,
-      ...fileData,
-      verification: {
-        create: {
-          status: "submitted",
-          updatedAt: submittedAt,
-        },
-      },
-    },
-  });
-
-  return toSubmission(created);
 }
 
 export async function getProofSubmissionById(
