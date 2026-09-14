@@ -28,7 +28,7 @@ export function TaskSubmitProgress({
             : verified
               ? "Verified — reward not issued"
               : submitted
-                ? "Submitted for verification — not live"
+                ? "Pending verification"
                 : "Completed — proof required"}
         </p>
       </div>

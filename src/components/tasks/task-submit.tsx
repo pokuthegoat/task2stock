@@ -122,7 +122,7 @@ export function TaskSubmit({
             />
           </section>
 
-          {submitted && verified ? (
+          {submitted ? (
             <div className="mt-14">
               <TaskSubmitStatus
                 details={details.trim()}
@@ -208,7 +208,7 @@ export function TaskSubmit({
                     : verified
                       ? "Verified"
                       : submitted
-                        ? "Submitted — not verified"
+                        ? "Pending verification"
                         : "Completed"}
                 </dd>
               </div>
@@ -231,11 +231,13 @@ export function TaskSubmit({
             </dl>
 
             <div className="mt-8">
-              {verified ? (
+              {submitted ? (
                 <p className="text-xs leading-5 text-foreground/38">
                   {issued
                     ? "Issued. No holding was created."
-                    : "Verified. Reward is pending issuance."}
+                    : verified
+                      ? "Verified. Reward is pending issuance."
+                      : "Pending verification. No reward is issued, and Portfolio is unchanged."}
                 </p>
               ) : (
                 <>

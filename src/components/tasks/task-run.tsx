@@ -41,7 +41,7 @@ export function TaskRun({
     try {
       const result = await saveAttemptChecklistAction(task.id, indexes);
 
-      if (!result.ok && result.code !== "UNAUTHENTICATED") {
+      if (!result.ok && !("code" in result && result.code === "UNAUTHENTICATED")) {
         setChecked(checked);
       }
     } catch {
@@ -57,7 +57,7 @@ export function TaskRun({
     try {
       const result = await markAttemptCompleteAction(task.id);
 
-      if (result.ok || result.code === "UNAUTHENTICATED") {
+      if (result.ok || ("code" in result && result.code === "UNAUTHENTICATED")) {
         setComplete(true);
       }
     } finally {

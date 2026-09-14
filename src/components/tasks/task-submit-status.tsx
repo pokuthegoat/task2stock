@@ -20,21 +20,21 @@ export function TaskSubmitStatus({
           ? "Reward issued"
           : verified
             ? "Verified"
-            : "Submitted for verification"}
+            : "Pending verification"}
       </p>
       <h2 className="heading mt-3 text-3xl text-foreground">
         {issued
           ? "Reward issued."
           : verified
             ? "Proof verified."
-            : "Proof submitted — not verified."}
+            : "Pending verification"}
       </h2>
       <p className="mt-4 max-w-lg text-sm leading-6 text-foreground/58">
         {issued
           ? `${issuedLabel ? `${issuedLabel} was marked issued. ` : ""}The operator fulfills this outside the app. No holding was created.`
           : verified
             ? "This proof was marked verified. The reward is pending issuance."
-            : "Your proof is saved. Verification is still a manual operator step."}
+            : "Your proof is saved. It stays pending until an operator reviews it. No reward is issued yet."}
       </p>
       {details ? (
         <div className="mt-6 border-t border-white/8 pt-5">

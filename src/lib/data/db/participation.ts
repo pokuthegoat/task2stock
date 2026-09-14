@@ -2,6 +2,11 @@ import "server-only";
 
 import type { Prisma } from "@prisma/client";
 import { getPrisma } from "@/lib/data/db/client";
+import { ensureCatalogTask } from "@/lib/data/db/ensure-catalog";
+import {
+  isForeignKeyConstraintError,
+  logDatabaseError,
+} from "@/lib/data/db/errors";
 import {
   toAttempt,
   toCompletion,
@@ -137,7 +142,7 @@ export async function getCurrentAttempt(
   return row ? toAttempt(row) : undefined;
 }
 
-export async function startTaskAttempt(
+async function upsertTaskAttempt(
   userId: UserId,
   taskId: TaskId,
 ): Promise<TaskAttempt> {
@@ -156,6 +161,37 @@ export async function startTaskAttempt(
   });
 
   return toAttempt(created);
+}
+
+export async function startTaskAttempt(
+  userId: UserId,
+  taskId: TaskId,
+): Promise<TaskAttempt> {
+  const ready = await ensureCatalogTask(taskId);
+
+  if (!ready) {
+    throw new Error(`Unknown task ${taskId}`);
+  }
+
+  try {
+    return await upsertTaskAttempt(userId, taskId);
+  } catch (error) {
+    if (isForeignKeyConstraintError(error)) {
+      const retried = await ensureCatalogTask(taskId);
+
+      if (retried) {
+        try {
+          return await upsertTaskAttempt(userId, taskId);
+        } catch (retryError) {
+          logDatabaseError("startTaskAttempt", retryError);
+          throw new Error("Unable to start this task.");
+        }
+      }
+    }
+
+    logDatabaseError("startTaskAttempt", error);
+    throw new Error("Unable to start this task.");
+  }
 }
 
 export async function saveAttemptChecklist(

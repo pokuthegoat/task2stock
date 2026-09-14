@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { TaskSubmit } from "@/components/tasks/task-submit";
-import { readParticipantId } from "@/lib/auth/participant";
+import { PROFILE_SETUP_PATH } from "@/lib/auth/profile-gate";
+import { getSession } from "@/lib/auth/session";
 import { getTaskById, listTasks } from "@/lib/data/catalog";
-import { emptyTaskProgress, getTaskProgress } from "@/lib/data/participation";
+import { getTaskProgress } from "@/lib/data/participation";
+
+export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
   const tasks = await listTasks();
@@ -38,10 +41,17 @@ export default async function TaskSubmitPage({
     notFound();
   }
 
-  const participantId = await readParticipantId();
-  const progress = participantId
-    ? await getTaskProgress(participantId, task.id)
-    : emptyTaskProgress;
+  const session = await getSession();
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  if (!session.user.username) {
+    redirect(PROFILE_SETUP_PATH);
+  }
+
+  const progress = await getTaskProgress(session.user.id, task.id);
   const submitted = Boolean(progress.submission);
   const verified = progress.verification?.status === "verified";
   const issuedReward =

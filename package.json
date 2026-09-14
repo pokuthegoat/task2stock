@@ -13,7 +13,9 @@
     "db:seed": "prisma db seed",
     "db:status": "prisma migrate status",
     "db:check": "tsx scripts/validate-db.ts",
-    "db:turso-migrate": "tsx scripts/apply-turso-migrations.ts"
+    "db:turso-migrate": "tsx scripts/apply-turso-migrations.ts",
+    "db:turso-seed": "tsx scripts/seed-turso-catalog.ts",
+    "test:task-flow": "tsx scripts/validate-task-flow.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -20,3 +20,17 @@ export function isDuplicateConstraintError(error: unknown) {
     error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002"
   );
 }
+
+export function isForeignKeyConstraintError(error: unknown) {
+  if (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === "P2003"
+  ) {
+    return true;
+  }
+
+  return (
+    error instanceof Error &&
+    /FOREIGN KEY constraint failed/i.test(error.message)
+  );
+}
