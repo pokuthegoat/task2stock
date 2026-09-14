@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { SignupForm } from "@/components/auth/signup-form";
-import { isGoogleOAuthConfigured } from "@/lib/auth/google";
 import { getSession } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: "Create account — Task2Stock",
   description:
-    "Create a Task2Stock account to keep completed tasks with you.",
+    "Create a Task2Stock account with Phantom or email and password.",
 };
 
 export default async function SignupPage() {
@@ -24,9 +23,9 @@ export default async function SignupPage() {
         <AuthShell
           eyebrow="Account"
           title="Create an account"
-          description="Create an account to keep completed tasks with you."
+          description="Connect Phantom to create your account. Email and password remain available as a fallback."
         >
-          <SignupForm googleEnabled={isGoogleOAuthConfigured()} />
+          <SignupForm />
         </AuthShell>
       </section>
     </main>

@@ -12,36 +12,13 @@ Override only if needed:
 NEXT_PUBLIC_CONTACT_EMAIL=task2stock@gmail.com
 ```
 
-## Google OAuth
+## Phantom wallet authentication
 
-Email/password stays the default. Google is optional.
+`/login` and `/signup` use Phantom as the primary sign-in option. Email and password remain a fallback.
 
-1. Create an OAuth client in Google Cloud Console (Web application).
-2. Add the authorized redirect URI:
+No API key or third-party auth provider is required. The server creates a one-time nonce, Phantom signs a Task2Stock message, and the server verifies the Ed25519 signature before creating the existing `t2s_session` cookie.
 
-```
-http://localhost:3000/auth/google/callback
-```
-
-For production, add:
-
-```
-https://YOUR_DOMAIN/auth/google/callback
-```
-
-3. Set these in `.env` (never commit secrets):
-
-```
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-APP_URL=http://localhost:3000
-```
-
-`APP_URL` must match the origin used in the Google redirect URI.
-
-If either Google variable is missing, the app does not crash. The button stays “Coming soon” and email/password still works.
-
-Successful Google sign-in finds or creates a User by email, then uses the existing session cookie. Access tokens are not stored.
+Wallet-only users are stored with `walletAddress` and do not receive a password or a synthetic email. Wallets are not linked to existing email/password accounts.
 
 ## Proof file storage
 

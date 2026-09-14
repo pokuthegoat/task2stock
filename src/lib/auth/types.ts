@@ -1,7 +1,9 @@
 export type AuthUser = {
   id: string;
   name: string;
-  email: string;
+  email: string | null;
+  walletAddress: string | null;
+  hasPassword: boolean;
 };
 
 export type Session = {
@@ -14,7 +16,7 @@ export type AuthResult =
       ok: false;
       code:
         | "VALIDATION"
-        | "NOT_CONNECTED"
+        | "WALLET"
         | "INVALID_CREDENTIALS"
         | "EMAIL_TAKEN";
       message: string;

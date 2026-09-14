@@ -179,17 +179,22 @@ body {
   transform: none;
 }
 
-.loop-stage {
-  opacity: 0.28;
-  transform: translateY(8px) scale(0.985);
+.story-state {
+  opacity: 0;
+  transform: translateY(8px);
   transition:
-    opacity 380ms ease,
-    transform 380ms ease;
+    opacity 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.loop-stage.is-active {
+.story-state[data-active="true"] {
   opacity: 1;
   transform: none;
+}
+
+.story-bar-fill {
+  transform: scaleX(0);
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -198,9 +203,17 @@ body {
   }
 
   .reveal-on-scroll,
-  .loop-stage {
+  .story-state {
     opacity: 1;
     transform: none;
+    transition: none;
+  }
+
+  .story-state[data-active="false"] {
+    opacity: 0;
+  }
+
+  .story-bar-fill {
     transition: none;
   }
 }

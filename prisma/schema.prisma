@@ -11,16 +11,30 @@ datasource db {
 }
 
 model User {
-  id           String   @id
-  name         String
-  email        String   @unique
-  /// bcrypt hash. Never send this field to the client.
-  passwordHash String
-  createdAt    DateTime @default(now())
+  id            String   @id
+  name          String
+  email         String?  @unique
+  /// scrypt hash for email/password accounts. Null for wallet-only users.
+  passwordHash  String?
+  walletAddress String?  @unique
+  createdAt     DateTime @default(now())
 
   sessions AuthSession[]
   rewards  Reward[]
   holdings Holding[]
+}
+
+/// One-time Phantom sign-in challenge. Never store wallet secrets.
+model WalletAuthChallenge {
+  id            String    @id
+  nonce         String    @unique
+  walletAddress String
+  message       String
+  expiresAt     DateTime
+  consumedAt    DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([expiresAt])
 }
 
 /// Opaque server session. Cookie stores only this id.

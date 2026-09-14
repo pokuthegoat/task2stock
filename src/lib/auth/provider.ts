@@ -7,18 +7,9 @@ import {
   verifyPassword,
 } from "@/lib/auth/password";
 import { createSession, destroySession } from "@/lib/auth/session";
-import type { AuthResult, AuthUser } from "@/lib/auth/types";
+import type { AuthResult } from "@/lib/auth/types";
+import { toAuthUser } from "@/lib/auth/wallet";
 import { getPrisma } from "@/lib/data/db/client";
-
-const GOOGLE_NOT_CONNECTED: AuthResult = {
-  ok: false,
-  code: "NOT_CONNECTED",
-  message: "Google sign-in is not connected yet. No OAuth flow was started.",
-};
-
-function toAuthUser(user: { id: string; name: string; email: string }): AuthUser {
-  return { id: user.id, name: user.name, email: user.email };
-}
 
 export async function signInWithPassword(input: {
   email: string;
@@ -31,11 +22,16 @@ export async function signInWithPassword(input: {
       id: true,
       name: true,
       email: true,
+      walletAddress: true,
       passwordHash: true,
     },
   });
 
-  if (!user || !(await verifyPassword(input.password, user.passwordHash))) {
+  if (
+    !user ||
+    !user.passwordHash ||
+    !(await verifyPassword(input.password, user.passwordHash))
+  ) {
     return {
       ok: false,
       code: "INVALID_CREDENTIALS",
@@ -64,7 +60,13 @@ export async function signUpWithPassword(input: {
         email,
         passwordHash,
       },
-      select: { id: true, name: true, email: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        walletAddress: true,
+        passwordHash: true,
+      },
     });
 
     await createSession(user.id);
@@ -92,7 +94,13 @@ export async function updateAccountName(input: {
   const name = input.name.trim();
   const user = await getPrisma().user.findUnique({
     where: { id: input.userId },
-    select: { id: true, name: true, email: true },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      walletAddress: true,
+      passwordHash: true,
+    },
   });
 
   if (!user) {
@@ -106,7 +114,13 @@ export async function updateAccountName(input: {
   const updated = await getPrisma().user.update({
     where: { id: user.id },
     data: { name },
-    select: { id: true, name: true, email: true },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      walletAddress: true,
+      passwordHash: true,
+    },
   });
 
   return { ok: true, user: toAuthUser(updated) };
@@ -123,6 +137,7 @@ export async function changeAccountPassword(input: {
       id: true,
       name: true,
       email: true,
+      walletAddress: true,
       passwordHash: true,
     },
   });
@@ -135,7 +150,10 @@ export async function changeAccountPassword(input: {
     };
   }
 
-  if (!(await verifyPassword(input.currentPassword, user.passwordHash))) {
+  if (
+    !user.passwordHash ||
+    !(await verifyPassword(input.currentPassword, user.passwordHash))
+  ) {
     return {
       ok: false,
       code: "INVALID_CREDENTIALS",
@@ -149,10 +167,6 @@ export async function changeAccountPassword(input: {
   });
 
   return { ok: true, user: toAuthUser(user) };
-}
-
-export async function signInWithGoogle(): Promise<AuthResult> {
-  return GOOGLE_NOT_CONNECTED;
 }
 
 export async function signOut(): Promise<void> {

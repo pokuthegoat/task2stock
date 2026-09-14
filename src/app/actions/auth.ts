@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
-  signInWithGoogle,
   signInWithPassword,
   signOut as clearSession,
   signUpWithPassword,
@@ -14,6 +13,7 @@ import {
   validateLogin,
   validateSignup,
 } from "@/lib/auth/validation";
+import { beginWalletAuth, completeWalletAuth } from "@/lib/auth/wallet";
 
 function readField(formData: FormData, key: string) {
   return String(formData.get(key) ?? "");
@@ -65,13 +65,23 @@ export async function signUpAction(
   redirect("/tasks");
 }
 
-/** Kept for a future Google OAuth connection. Login/signup no longer call this. */
-export async function continueWithGoogleAction(
-  _prev: AuthFormState,
-  _formData: FormData,
-): Promise<AuthFormState> {
-  const result = await signInWithGoogle();
-  return { ok: result.ok, errors: {}, message: result.ok ? null : result.message };
+export async function beginWalletAuthAction(walletAddress: string) {
+  return beginWalletAuth(walletAddress);
+}
+
+export async function completeWalletAuthAction(input: {
+  challengeId: string;
+  publicKey: string;
+  signature: string;
+}) {
+  const result = await completeWalletAuth(input);
+
+  if (!result.ok) {
+    return { ok: false as const, error: result.message };
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/tasks");
 }
 
 export async function signOutAction() {

@@ -42,7 +42,13 @@ export const getSession = cache(async (): Promise<Session | null> => {
     where: { id: hashSessionToken(token) },
     include: {
       user: {
-        select: { id: true, name: true, email: true },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          walletAddress: true,
+          passwordHash: true,
+        },
       },
     },
   });
@@ -60,6 +66,8 @@ export const getSession = cache(async (): Promise<Session | null> => {
       id: row.user.id,
       name: row.user.name,
       email: row.user.email,
+      walletAddress: row.user.walletAddress,
+      hasPassword: Boolean(row.user.passwordHash),
     },
   };
 });

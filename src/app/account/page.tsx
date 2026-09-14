@@ -8,7 +8,7 @@ import { getSession } from "@/lib/auth/session";
 
 export const metadata: Metadata = {
   title: "Account — Task2Stock",
-  description: "View and update your Task2Stock name and password.",
+  description: "View and update your Task2Stock account.",
 };
 
 export default async function AccountPage() {
@@ -26,7 +26,7 @@ export default async function AccountPage() {
             as="h1"
             eyebrow="Account"
             title="Account"
-            description="Your name and email for this signed-in account."
+            description="The signed-in Task2Stock account for this session."
           />
         </PageContainer>
       </section>
@@ -36,18 +36,29 @@ export default async function AccountPage() {
           <div className="border-t border-white/8 pt-8">
             <p className="label">Profile</p>
             <h2 className="heading mt-3 text-3xl text-foreground">
-              Name and email
+              {session.user.walletAddress ? "Wallet and name" : "Name and email"}
             </h2>
             <p className="mt-4 text-sm leading-6 text-foreground/58">
-              Email stays with this account. You can update the name shown in
-              the app.
+              {session.user.walletAddress
+                ? "This account signed in with Phantom. You can update the name shown in the app."
+                : "Email stays with this account. You can update the name shown in the app."}
             </p>
-            <div className="mt-6 border-t border-white/8 pt-5">
-              <p className="label">Email</p>
-              <p className="mt-2 text-sm font-medium text-foreground">
-                {session.user.email}
-              </p>
-            </div>
+            {session.user.walletAddress ? (
+              <div className="mt-6 border-t border-white/8 pt-5">
+                <p className="label">Wallet</p>
+                <p className="mt-2 break-all font-mono text-sm font-medium text-foreground">
+                  {session.user.walletAddress}
+                </p>
+              </div>
+            ) : null}
+            {session.user.email ? (
+              <div className="mt-6 border-t border-white/8 pt-5">
+                <p className="label">Email</p>
+                <p className="mt-2 text-sm font-medium text-foreground">
+                  {session.user.email}
+                </p>
+              </div>
+            ) : null}
             <div className="mt-6">
               <AccountNameForm name={session.user.name} />
             </div>
@@ -55,13 +66,29 @@ export default async function AccountPage() {
 
           <div className="border-t border-white/8 pt-8">
             <p className="label">Security</p>
-            <h2 className="heading mt-3 text-3xl text-foreground">Password</h2>
-            <p className="mt-4 text-sm leading-6 text-foreground/58">
-              Enter your current password, then choose a new one.
-            </p>
-            <div className="mt-6">
-              <AccountPasswordForm />
-            </div>
+            {session.user.hasPassword ? (
+              <>
+                <h2 className="heading mt-3 text-3xl text-foreground">
+                  Password
+                </h2>
+                <p className="mt-4 text-sm leading-6 text-foreground/58">
+                  Enter your current password, then choose a new one.
+                </p>
+                <div className="mt-6">
+                  <AccountPasswordForm />
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="heading mt-3 text-3xl text-foreground">
+                  Phantom
+                </h2>
+                <p className="mt-4 text-sm leading-6 text-foreground/58">
+                  This account signs in with Phantom. Password sign-in is not
+                  set, and wallets are not linked to email accounts.
+                </p>
+              </>
+            )}
           </div>
         </PageContainer>
       </section>
