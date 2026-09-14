@@ -4,7 +4,8 @@ import { TaskSubmit } from "@/components/tasks/task-submit";
 import { PROFILE_SETUP_PATH } from "@/lib/auth/profile-gate";
 import { getSession } from "@/lib/auth/session";
 import { getTaskById, listTasks } from "@/lib/data/catalog";
-import { getTaskProgress } from "@/lib/data/participation";
+import { logDatabaseError } from "@/lib/data/db/errors";
+import { getTaskProgress, startTaskAttempt } from "@/lib/data/participation";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +28,7 @@ export async function generateMetadata({
 
   return {
     title: `${task.title} — Submit proof`,
-    description: `Submit proof for ${task.title}.`
+    description: `Submit proof for ${task.title}.`,
   };
 }
 
@@ -51,21 +52,26 @@ export default async function TaskSubmitPage({
     redirect(PROFILE_SETUP_PATH);
   }
 
+  try {
+    await startTaskAttempt(session.user.id, task.id);
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith("Unknown task")) {
+      notFound();
+    }
+
+    logDatabaseError("taskSubmit", error);
+    throw error;
+  }
+
   const progress = await getTaskProgress(session.user.id, task.id);
   const submitted = Boolean(progress.submission);
-  const complete =
-    progress.attempt?.status === "marked_complete" ||
-    Boolean(progress.completion);
-
-  if (!submitted && !complete) {
-    redirect(`/tasks/${task.id}/run`);
-  }
 
   return (
     <main id="main" className="section-base flex-1">
       <TaskSubmit
         task={task}
         initialDetails={progress.submission?.details ?? ""}
+        initialVideoUrl={progress.submission?.videoUrl ?? ""}
         initialFile={
           progress.submission?.file
             ? {

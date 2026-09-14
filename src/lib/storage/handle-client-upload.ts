@@ -75,12 +75,7 @@ export async function handleStoreClientUpload(
         }
 
         return {
-          allowedContentTypes: [
-            "image/png",
-            "image/jpeg",
-            "image/webp",
-            "application/pdf",
-          ],
+          allowedContentTypes: ["image/png", "image/jpeg", "image/webp"],
           maximumSizeInBytes: PROOF_MAX_BYTES,
           addRandomSuffix: true,
           tokenPayload: JSON.stringify({

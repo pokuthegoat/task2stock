@@ -83,9 +83,8 @@ export function TaskDetail({ task }: { task: TaskView }) {
               The product model
             </h2>
             <p className="mt-3 max-w-xl text-sm leading-6 text-foreground/52">
-              Complete the task → Submit proof → Verification → Stock reward.
-              That is the intended sequence. Submission, review, and settlement
-              are not live in this preview.
+              Start the task, submit proof, then a moderator reviews it. Stock
+              is not issued until verification.
             </p>
             <ol className="mt-6 grid gap-3 sm:grid-cols-2">
               {modelSteps.map((step, index) => (
@@ -156,7 +155,7 @@ export function TaskDetail({ task }: { task: TaskView }) {
             </div>
 
             <div className="mt-8">
-              <Button href={`/tasks/${task.id}/run`} className="w-full">
+              <Button href={`/tasks/${task.id}/submit`} className="w-full">
                 Start task
               </Button>
               <p className="mt-3 text-center text-xs leading-5 text-foreground/38">

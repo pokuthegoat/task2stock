@@ -221,6 +221,7 @@ async function main() {
         userId,
         taskId: TASK_ID,
         details: "Logged outdoor runs and attached a recap note.",
+        videoUrl: "https://www.youtube.com/watch?v=dQw4w9wgGcQ",
         submittedAt,
         verification: {
           create: {
@@ -262,6 +263,10 @@ async function main() {
     assert(
       persisted.completion?.submission?.details.includes("recap note"),
       "Proof submission did not persist.",
+    );
+    assert(
+      persisted.completion?.submission?.videoUrl?.startsWith("https://"),
+      "Video URL did not persist.",
     );
 
     console.log("validate-task-flow: ok", {

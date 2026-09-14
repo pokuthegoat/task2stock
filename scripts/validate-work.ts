@@ -13,6 +13,7 @@ const submission: ProofSubmission = {
   details: "Done",
   submittedAt: "2026-09-13T00:00:00.000Z",
   file: null,
+  videoUrl: null,
 };
 
 const submitted: VerificationRecord = {
@@ -87,12 +88,12 @@ function main() {
     "reward_issued",
   );
 
-  if (workHref("run-20km", "in_progress") !== "/tasks/run-20km/run") {
-    throw new Error("In progress must link to the run page.");
+  if (workHref("run-20km") !== "/tasks/run-20km/submit") {
+    throw new Error("In progress must link to the submit page.");
   }
 
   for (const status of ["proof_submitted", "verified", "reward_issued"] as const) {
-    if (workHref("run-20km", status) !== "/tasks/run-20km/submit") {
+    if (workHref("run-20km") !== "/tasks/run-20km/submit") {
       throw new Error(`${status} must link to the submit page.`);
     }
   }

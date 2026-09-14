@@ -64,6 +64,7 @@ type SubmissionRow = {
   fileContentType?: string | null;
   fileSize?: number | null;
   fileStorageKey?: string | null;
+  videoUrl?: string | null;
 };
 type VerificationRow = {
   submissionId: string;
@@ -285,6 +286,7 @@ export function toSubmission(row: SubmissionRow): ProofSubmission {
       fileName && contentType && storageKey && size != null
         ? { fileName, contentType, size, storageKey }
         : null,
+    videoUrl: row.videoUrl?.trim() || null,
   };
 }
 

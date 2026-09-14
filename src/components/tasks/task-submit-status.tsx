@@ -6,12 +6,14 @@ export function TaskSubmitStatus({
   reward,
   submittedAt,
   details,
+  videoUrl,
   file,
 }: {
   taskTitle: string;
   reward: { amountCents: number; ticker: string };
   submittedAt?: string | null;
   details: string;
+  videoUrl?: string | null;
   file?: { fileName: string; size: number; href: string } | null;
 }) {
   const submittedLabel = submittedAt
@@ -24,10 +26,9 @@ export function TaskSubmitStatus({
 
   return (
     <div className="pt-2">
-      <p className="label">Payout pending</p>
-      <p className="mt-4 max-w-lg text-sm leading-6 text-foreground/58">
-        A moderator will review your submission and verify your proof. If your
-        submission is approved, your stock reward will be processed.
+      <p className="max-w-lg text-sm leading-6 text-foreground/58">
+        A moderator will review your proof and, if approved, your stock reward
+        will be processed.
       </p>
       <dl className="mt-8 space-y-4 border-t border-white/8 pt-5 text-sm">
         <div className="flex justify-between gap-4">
@@ -53,7 +54,7 @@ export function TaskSubmitStatus({
       </dl>
       {details ? (
         <div className="mt-6 border-t border-white/8 pt-5">
-          <p className="label">Proof description</p>
+          <p className="label">What you did</p>
           <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-foreground/70">
             {details}
           </p>
@@ -61,7 +62,7 @@ export function TaskSubmitStatus({
       ) : null}
       {file ? (
         <div className="mt-6 border-t border-white/8 pt-5">
-          <p className="label">Proof file</p>
+          <p className="label">Image proof</p>
           <a
             href={file.href}
             className="mt-3 inline-flex text-sm font-medium text-accent hover:text-foreground"
@@ -77,12 +78,25 @@ export function TaskSubmitStatus({
           </p>
         </div>
       ) : null}
+      {videoUrl ? (
+        <div className="mt-6 border-t border-white/8 pt-5">
+          <p className="label">Video proof</p>
+          <a
+            href={videoUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 inline-flex break-all text-sm font-medium text-accent hover:text-foreground"
+          >
+            {videoUrl}
+          </a>
+        </div>
+      ) : null}
       <p className="mt-8 max-w-lg text-xs leading-5 text-foreground/38">
         {formatUsdCompact(reward.amountCents)} {reward.ticker} is not issued
         yet. Portfolio is unchanged.
       </p>
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <Button href="/tasks">Back to tasks</Button>
+      <div className="mt-8">
+        <Button href="/work">Back to my work</Button>
       </div>
     </div>
   );

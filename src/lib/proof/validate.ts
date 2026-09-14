@@ -30,10 +30,6 @@ export function detectProofContentType(
     return "image/webp";
   }
 
-  if (startsWith(bytes, [0x25, 0x50, 0x44, 0x46])) {
-    return "application/pdf";
-  }
-
   return null;
 }
 
@@ -49,7 +45,7 @@ export function validateProofFile(bytes: Uint8Array): {
   }
 
   if (bytes.byteLength > PROOF_MAX_BYTES) {
-    return { ok: false, error: "Files must be 10 MB or smaller." };
+    return { ok: false, error: "Images must be 10 MB or smaller." };
   }
 
   const contentType = detectProofContentType(bytes);
@@ -57,7 +53,7 @@ export function validateProofFile(bytes: Uint8Array): {
   if (!contentType || !PROOF_CONTENT_TYPES.includes(contentType)) {
     return {
       ok: false,
-      error: "Use a PNG, JPEG, WEBP, or PDF file.",
+      error: "Use a PNG, JPEG, or WEBP image.",
     };
   }
 

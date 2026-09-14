@@ -1,6 +1,9 @@
 import "server-only";
 
-import { getProofInputError } from "@/lib/proof/input";
+import {
+  getProofInputError,
+  validateVideoProofUrl,
+} from "@/lib/proof/input";
 import {
   getCurrentAttempt,
   getProofSubmissionForAttempt,
@@ -19,7 +22,7 @@ export async function submitUserProof(input: {
   details: string;
   file?: File | null;
   blobUrl?: string | null;
-  removeFile?: boolean;
+  videoUrl?: string | null;
 }) {
   const details = input.details.trim();
   const attempt = await getCurrentAttempt(input.userId, input.taskId);
@@ -37,9 +40,17 @@ export async function submitUserProof(input: {
 
   const file = input.file && input.file.size > 0 ? input.file : null;
   const blobUrl = input.blobUrl?.trim() || null;
+  const videoUrl = input.videoUrl?.trim() || "";
+  const videoError = validateVideoProofUrl(videoUrl);
+
+  if (videoError) {
+    return { ok: false as const, error: videoError };
+  }
+
   const inputError = getProofInputError({
     details,
     hasFile: Boolean(file || blobUrl),
+    hasVideoUrl: Boolean(videoUrl),
   });
 
   if (inputError) {
@@ -51,7 +62,7 @@ export async function submitUserProof(input: {
     contentType: string;
     size: number;
     storageKey: string;
-  };
+  } | null = null;
 
   if (blobUrl) {
     const owned = await inspectOwnedBlob({
@@ -63,7 +74,7 @@ export async function submitUserProof(input: {
     if (!owned) {
       return {
         ok: false as const,
-        error: "Unable to upload the proof file. Try again.",
+        error: "Unable to upload the image. Try again.",
       };
     }
 
@@ -76,15 +87,11 @@ export async function submitUserProof(input: {
       size: owned.size,
       storageKey: owned.url,
     };
-  } else {
-    if (!file) {
-      return { ok: false as const, error: "Upload a proof file." };
-    }
-
+  } else if (file) {
     if (!isAllowedProofFileName(file.name)) {
       return {
         ok: false as const,
-        error: "Use a PNG, JPEG, WEBP, or PDF file.",
+        error: "Use a PNG, JPEG, or WEBP image.",
       };
     }
 
@@ -118,7 +125,7 @@ export async function submitUserProof(input: {
       logDatabaseError("proofUpload", error);
       return {
         ok: false as const,
-        error: "Unable to upload the proof file. Try again.",
+        error: "Unable to upload the image. Try again.",
       };
     }
   }
@@ -126,15 +133,18 @@ export async function submitUserProof(input: {
   try {
     const submission = await submitProof(input.userId, input.taskId, {
       details,
+      videoUrl,
       file: stored,
     });
 
     return { ok: true as const, submission };
   } catch (error) {
-    try {
-      await getProofStorageProvider().delete(stored.storageKey);
-    } catch (cleanupError) {
-      logDatabaseError("proofUploadCleanup", cleanupError);
+    if (stored) {
+      try {
+        await getProofStorageProvider().delete(stored.storageKey);
+      } catch (cleanupError) {
+        logDatabaseError("proofUploadCleanup", cleanupError);
+      }
     }
 
     logDatabaseError("submitProof", error);

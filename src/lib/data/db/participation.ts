@@ -278,6 +278,7 @@ export async function getVerificationForAttempt(
 export type ProofWriteInput = {
   id?: string;
   details: string;
+  videoUrl?: string | null;
   file?: {
     fileName: string;
     contentType: string;
@@ -291,24 +292,14 @@ export async function submitProof(
   taskId: TaskId,
   input: ProofWriteInput,
 ): Promise<ProofSubmission> {
-  const attempt = await markAttemptComplete(userId, taskId);
-  const completion = await getPrisma().taskCompletion.findUnique({
-    where: { attemptId: attempt.id },
-  });
-
-  if (!completion) {
-    throw new Error(`Missing completion for attempt ${attempt.id}`);
-  }
-
-  const existing = await getPrisma().proofSubmission.findUnique({
-    where: { completionId: completion.id },
-    include: { verification: true },
-  });
+  const attempt = await startTaskAttempt(userId, taskId);
+  const existing = await getProofSubmissionForAttempt(attempt.id);
 
   if (existing) {
-    return toSubmission(existing);
+    return existing;
   }
 
+  const now = new Date();
   const fileData = input.file
     ? {
         fileName: input.file.fileName,
@@ -316,38 +307,73 @@ export async function submitProof(
         fileSize: input.file.size,
         fileStorageKey: input.file.storageKey,
       }
-    : {};
-
-  const submittedAt = new Date();
+    : {
+        fileName: null,
+        fileContentType: null,
+        fileSize: null,
+        fileStorageKey: null,
+      };
+  const videoUrl = input.videoUrl?.trim() || null;
 
   try {
-    const created = await getPrisma().proofSubmission.create({
-      data: {
-        id: input.id ?? crypto.randomUUID(),
-        completionId: completion.id,
-        userId,
-        taskId,
-        details: input.details,
-        submittedAt,
-        ...fileData,
-        verification: {
-          create: {
-            status: "submitted",
-            updatedAt: submittedAt,
+    const created = await getPrisma().$transaction(async (tx) => {
+      await tx.taskAttempt.update({
+        where: { id: attempt.id },
+        data: {
+          status: "marked_complete",
+          markedCompleteAt: attempt.markedCompleteAt
+            ? new Date(attempt.markedCompleteAt)
+            : now,
+        },
+      });
+
+      const completion = await tx.taskCompletion.upsert({
+        where: { attemptId: attempt.id },
+        update: {},
+        create: {
+          id: crypto.randomUUID(),
+          attemptId: attempt.id,
+          userId,
+          taskId,
+          markedCompleteAt: now,
+        },
+      });
+
+      const raced = await tx.proofSubmission.findUnique({
+        where: { completionId: completion.id },
+      });
+
+      if (raced) {
+        return raced;
+      }
+
+      return tx.proofSubmission.create({
+        data: {
+          id: input.id ?? crypto.randomUUID(),
+          completionId: completion.id,
+          userId,
+          taskId,
+          details: input.details,
+          submittedAt: now,
+          videoUrl,
+          ...fileData,
+          verification: {
+            create: {
+              status: "submitted",
+              updatedAt: now,
+            },
           },
         },
-      },
+      });
     });
 
     return toSubmission(created);
   } catch (error) {
     if (isDuplicateConstraintError(error)) {
-      const raced = await getPrisma().proofSubmission.findUnique({
-        where: { completionId: completion.id },
-      });
+      const raced = await getProofSubmissionForAttempt(attempt.id);
 
       if (raced) {
-        return toSubmission(raced);
+        return raced;
       }
     }
 
@@ -576,7 +602,7 @@ export async function listWorkForUser(userId: UserId): Promise<WorkItemView[]> {
         timeBucket: task.timeBucket,
         status,
         statusLabel: workStatusLabels[status],
-        href: workHref(task.id, status),
+        href: workHref(task.id),
       };
     });
 }

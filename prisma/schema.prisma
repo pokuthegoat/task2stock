@@ -146,6 +146,8 @@ model ProofSubmission {
   fileContentType String?
   fileSize        Int?
   fileStorageKey  String?
+  /// External https video URL. Never downloaded or stored in Blob.
+  videoUrl        String?
 
   completion   TaskCompletion       @relation(fields: [completionId], references: [id])
   task         Task                 @relation(fields: [taskId], references: [id])

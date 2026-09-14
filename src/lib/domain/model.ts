@@ -99,6 +99,7 @@ export type ProofSubmission = {
   details: string;
   submittedAt: string;
   file: ProofFile | null;
+  videoUrl: string | null;
 };
 
 /** Status only. Do not add reviewer rules, scoring, or approval engines here. */

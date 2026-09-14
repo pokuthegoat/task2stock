@@ -3,11 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { readParticipantId } from "@/lib/auth/participant";
 import { logDatabaseError } from "@/lib/data/db/errors";
-import {
-  markAttemptComplete,
-  saveAttemptChecklist,
-  startTaskAttempt,
-} from "@/lib/data/participation";
+import { startTaskAttempt } from "@/lib/data/participation";
 import { submitUserProof } from "@/lib/proof/submit";
 import type { TaskId } from "@/lib/domain/model";
 
@@ -23,8 +19,8 @@ type WriteError = {
 };
 
 function revalidateTaskProgress(taskId: TaskId) {
-  revalidatePath(`/tasks/${taskId}/run`);
   revalidatePath(`/tasks/${taskId}/submit`);
+  revalidatePath(`/tasks/${taskId}`);
   revalidatePath("/work");
 }
 
@@ -35,7 +31,7 @@ async function requireUserId(): Promise<string | Unauthenticated> {
     return {
       ok: false,
       code: "UNAUTHENTICATED",
-      error: "Sign in to save your progress.",
+      error: "Sign in to submit proof.",
     };
   }
 
@@ -44,7 +40,7 @@ async function requireUserId(): Promise<string | Unauthenticated> {
 
 function toWriteError(scope: string, error: unknown): WriteError {
   logDatabaseError(scope, error);
-  return { ok: false, error: "Unable to save task progress." };
+  return { ok: false, error: "Unable to save your proof. Try again." };
 }
 
 export async function startTaskAttemptAction(taskId: TaskId) {
@@ -63,51 +59,16 @@ export async function startTaskAttemptAction(taskId: TaskId) {
   }
 }
 
-export async function saveAttemptChecklistAction(
-  taskId: TaskId,
-  checkedStepIndexes: number[],
-) {
-  const userId = await requireUserId();
-
-  if (typeof userId !== "string") {
-    return userId;
-  }
-
-  try {
-    await saveAttemptChecklist(userId, taskId, checkedStepIndexes);
-    revalidateTaskProgress(taskId);
-    return { ok: true as const };
-  } catch (error) {
-    return toWriteError("saveAttemptChecklist", error);
-  }
-}
-
-export async function markAttemptCompleteAction(taskId: TaskId) {
-  const userId = await requireUserId();
-
-  if (typeof userId !== "string") {
-    return userId;
-  }
-
-  try {
-    await markAttemptComplete(userId, taskId);
-    revalidateTaskProgress(taskId);
-    return { ok: true as const };
-  } catch (error) {
-    return toWriteError("markAttemptComplete", error);
-  }
-}
-
 export async function submitProofAction(formData: FormData) {
   const taskId = String(formData.get("taskId") ?? "") as TaskId;
   const details = String(formData.get("details") ?? "");
   const blobUrl = String(formData.get("blobUrl") ?? "");
-  const removeFile = String(formData.get("removeFile") ?? "") === "1";
+  const videoUrl = String(formData.get("videoUrl") ?? "");
   const uploaded = formData.get("file");
   const file = uploaded instanceof File ? uploaded : null;
 
   if (!taskId) {
-    return { ok: false as const, error: "Missing task." };
+    return { ok: false as const, error: "This task could not be found." };
   }
 
   const userId = await requireUserId();
@@ -123,7 +84,7 @@ export async function submitProofAction(formData: FormData) {
       details,
       file,
       blobUrl: blobUrl || null,
-      removeFile,
+      videoUrl: videoUrl || null,
     });
 
     if (!result.ok) {

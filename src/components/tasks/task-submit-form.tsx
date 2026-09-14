@@ -5,10 +5,12 @@ import { PROOF_MAX_BYTES } from "@/lib/proof/types";
 
 type TaskSubmitFormProps = {
   details: string;
+  videoUrl: string;
   error?: string;
   pending?: boolean;
   selectedFile: File | null;
   onDetailsChange: (value: string) => void;
+  onVideoUrlChange: (value: string) => void;
   onFileChange: (file: File | null) => void;
   onSubmit: () => void;
 };
@@ -21,39 +23,41 @@ function formatSize(bytes: number) {
 
 export function TaskSubmitForm({
   details,
+  videoUrl,
   error,
   pending = false,
   selectedFile,
   onDetailsChange,
+  onVideoUrlChange,
   onFileChange,
   onSubmit,
 }: TaskSubmitFormProps) {
   return (
     <form
       noValidate
-      className="space-y-8"
+      className="space-y-10"
       onSubmit={(event) => {
         event.preventDefault();
         onSubmit();
       }}
     >
       <div>
-        <p className="label">Upload proof file</p>
+        <p className="label">File proof</p>
         <label
-          className="mt-2 flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-[22px] border border-dashed border-white/16 bg-white/[0.03] px-5 py-8 text-center transition-colors hover:bg-white/[0.05]"
+          className="mt-3 flex min-h-48 cursor-pointer flex-col items-center justify-center rounded-[22px] border border-dashed border-white/16 bg-white/[0.03] px-5 py-10 text-center transition-colors hover:bg-white/[0.05]"
           onDragOver={(event) => {
             event.preventDefault();
           }}
           onDrop={(event) => {
             event.preventDefault();
-            const file = event.dataTransfer.files[0];
-            if (file) onFileChange(file);
+            const next = event.dataTransfer.files[0];
+            if (next) onFileChange(next);
           }}
           onDragEnter={(event) => event.preventDefault()}
         >
           <input
             type="file"
-            accept="image/png,image/jpeg,image/webp,application/pdf"
+            accept="image/png,image/jpeg,image/webp"
             className="sr-only"
             disabled={pending}
             onChange={(event) => {
@@ -61,9 +65,15 @@ export function TaskSubmitForm({
               event.target.value = "";
             }}
           />
-          <p className="text-sm font-medium text-foreground/80">Choose file</p>
-          <p className="mt-2 text-xs leading-5 text-foreground/40">
-            PNG, JPEG, WEBP, or PDF. Up to {formatSize(PROOF_MAX_BYTES)}.
+          <p className="text-base font-medium text-foreground/85">
+            Drag your proof here
+          </p>
+          <p className="mt-3 text-sm text-foreground/40">or</p>
+          <p className="mt-3 text-sm font-medium text-foreground/80">
+            Choose file
+          </p>
+          <p className="mt-3 text-xs leading-5 text-foreground/38">
+            PNG, JPEG, or WEBP. Up to {formatSize(PROOF_MAX_BYTES)}.
           </p>
         </label>
 
@@ -89,19 +99,40 @@ export function TaskSubmitForm({
       </div>
 
       <div>
+        <label htmlFor="proof-video-url" className="label">
+          Video proof (optional)
+        </label>
+        <input
+          id="proof-video-url"
+          name="videoUrl"
+          type="url"
+          inputMode="url"
+          value={videoUrl}
+          disabled={pending}
+          onChange={(event) => onVideoUrlChange(event.target.value)}
+          placeholder="Paste Streamable / YouTube / Vimeo link"
+          className="field-input mt-3"
+        />
+        <p className="mt-2 text-xs leading-5 text-foreground/38">
+          HTTPS link only. The video stays on that site.
+        </p>
+      </div>
+
+      <div>
         <label htmlFor="proof-details" className="label">
-          Proof description
+          Tell us what you did
         </label>
         <textarea
           id="proof-details"
           name="details"
           rows={6}
           value={details}
+          disabled={pending}
           onChange={(event) => onDetailsChange(event.target.value)}
           aria-invalid={Boolean(error)}
-          aria-describedby={error ? "proof-details-error" : "proof-details-hint"}
-          placeholder="Describe the work you completed and how this file proves it."
-          className={`field-textarea mt-2 ${
+          aria-describedby={error ? "proof-details-error" : undefined}
+          placeholder="Tell us what you did..."
+          className={`field-textarea mt-3 ${
             error ? "border-[#c9a9a2]/50" : ""
           }`}
         />
@@ -113,18 +144,11 @@ export function TaskSubmitForm({
           >
             {error}
           </p>
-        ) : (
-          <p
-            id="proof-details-hint"
-            className="mt-2 text-xs leading-5 text-foreground/38"
-          >
-            A moderator will review this description with your file.
-          </p>
-        )}
+        ) : null}
       </div>
 
       <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? "Saving…" : "Verify"}
+        {pending ? "Submitting…" : "Submit"}
       </Button>
     </form>
   );

@@ -14,7 +14,6 @@ export async function recordManualVerificationAction(submissionId: SubmissionId)
   const result = await recordManualVerificationForActor(actorUserId, submissionId);
 
   if (result.ok) {
-    revalidatePath(`/tasks/${result.taskId}/run`);
     revalidatePath(`/tasks/${result.taskId}/submit`);
     revalidatePath("/work");
   }

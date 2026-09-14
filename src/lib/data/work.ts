@@ -39,12 +39,10 @@ export function deriveWorkStatus(progress: {
   return "in_progress";
 }
 
-export function workHref(taskId: TaskId, status: WorkStatus): string {
-  return status === "in_progress"
-    ? `/tasks/${taskId}/run`
-    : `/tasks/${taskId}/submit`;
+export function workHref(taskId: TaskId): string {
+  return `/tasks/${taskId}/submit`;
 }
 
 export function workActionLabel(status: WorkStatus): string {
-  return status === "in_progress" ? "Continue" : "View submission";
+  return status === "in_progress" ? "Submit proof" : "View submission";
 }
