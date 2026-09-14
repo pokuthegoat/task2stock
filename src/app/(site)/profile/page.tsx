@@ -7,7 +7,6 @@ import {
 } from "@/app/actions/profile";
 import { ProfileAvatar } from "@/components/profile/profile-avatar";
 import { ProfilePasswordForm } from "@/components/profile/profile-password-form";
-import { ProfilePictureForm } from "@/components/profile/profile-picture-form";
 import { ProfileTextForm } from "@/components/profile/profile-text-form";
 import { PageContainer } from "@/components/ui/page-container";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -83,16 +82,6 @@ export default async function ProfilePage() {
                 initialValue={profile.displayName}
                 submitLabel="Save display name"
               />
-              <div>
-                <p className="label">Profile picture</p>
-                <p className="mt-3 text-sm leading-6 text-foreground/58">
-                  Upload an image, or paste an https image URL. Leave the URL
-                  empty to use the fallback avatar.
-                </p>
-                <div className="mt-6">
-                  <ProfilePictureForm initialUrl={profile.avatarUrl ?? ""} />
-                </div>
-              </div>
             </div>
           </div>
 
