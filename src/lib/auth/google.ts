@@ -1,6 +1,11 @@
 import "server-only";
 
-import { createHash, randomBytes } from "node:crypto";
+import {
+  createCipheriv,
+  createDecipheriv,
+  createHash,
+  randomBytes,
+} from "node:crypto";
 
 export const GOOGLE_STATE_COOKIE = "t2s_google_state";
 export const GOOGLE_VERIFIER_COOKIE = "t2s_google_verifier";
@@ -10,6 +15,7 @@ export const GOOGLE_CALLBACK_PATH = "/api/auth/google/callback";
 const GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
 const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo";
+const OAUTH_STATE_TTL_MS = 10 * 60 * 1000;
 
 export type GoogleProfile = {
   email: string;
@@ -18,6 +24,10 @@ export type GoogleProfile = {
 
 function base64Url(bytes: Buffer) {
   return bytes.toString("base64url");
+}
+
+function firstHeaderValue(value: string | null) {
+  return value?.split(",")[0]?.trim() || "";
 }
 
 export function getGoogleClientId() {
@@ -35,11 +45,11 @@ export function isGoogleConfigured() {
 export function getRequestOrigin(request: Request) {
   const url = new URL(request.url);
   const host =
-    request.headers.get("x-forwarded-host") ??
-    request.headers.get("host") ??
+    firstHeaderValue(request.headers.get("x-forwarded-host")) ||
+    firstHeaderValue(request.headers.get("host")) ||
     url.host;
   const proto =
-    request.headers.get("x-forwarded-proto") ??
+    firstHeaderValue(request.headers.get("x-forwarded-proto")) ||
     (url.protocol === "https:" ? "https" : "http");
 
   return `${proto}://${host}`;
@@ -71,12 +81,71 @@ export function oauthCookieOptions(expires: Date) {
   };
 }
 
+function oauthStateKey() {
+  return createHash("sha256").update(getGoogleClientSecret()).digest();
+}
+
 export function createGoogleOAuthChallenge() {
-  const state = randomBytes(24).toString("hex");
   const verifier = base64Url(randomBytes(32));
   const challenge = base64Url(createHash("sha256").update(verifier).digest());
 
-  return { state, verifier, challenge };
+  return { verifier, challenge };
+}
+
+export function sealOAuthState(input: { verifier: string; nextPath: string }) {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv("aes-256-gcm", oauthStateKey(), iv);
+  const plaintext = Buffer.from(
+    JSON.stringify({
+      v: input.verifier,
+      n: input.nextPath,
+      t: Date.now(),
+    }),
+    "utf8",
+  );
+  const encrypted = Buffer.concat([cipher.update(plaintext), cipher.final()]);
+  const tag = cipher.getAuthTag();
+
+  return Buffer.concat([iv, tag, encrypted]).toString("base64url");
+}
+
+export function openOAuthState(state: string) {
+  try {
+    const packed = Buffer.from(state, "base64url");
+    if (packed.length < 29) {
+      return null;
+    }
+
+    const iv = packed.subarray(0, 12);
+    const tag = packed.subarray(12, 28);
+    const encrypted = packed.subarray(28);
+    const decipher = createDecipheriv("aes-256-gcm", oauthStateKey(), iv);
+    decipher.setAuthTag(tag);
+    const parsed = JSON.parse(
+      Buffer.concat([decipher.update(encrypted), decipher.final()]).toString(
+        "utf8",
+      ),
+    ) as { v?: unknown; n?: unknown; t?: unknown };
+
+    if (
+      typeof parsed.v !== "string" ||
+      typeof parsed.n !== "string" ||
+      typeof parsed.t !== "number"
+    ) {
+      return null;
+    }
+
+    if (Date.now() - parsed.t > OAUTH_STATE_TTL_MS) {
+      return null;
+    }
+
+    return {
+      verifier: parsed.v,
+      nextPath: parsed.n === "/signup" ? "/signup" : "/login",
+    };
+  } catch {
+    return null;
+  }
 }
 
 export function buildGoogleAuthorizationUrl(input: {
@@ -120,12 +189,33 @@ export async function exchangeGoogleAuthorizationCode(input: {
     body,
   });
 
-  if (!response.ok) {
-    console.error("[task2stock:google] token exchange failed", response.status);
+  let payload: { access_token?: unknown; error?: unknown } = {};
+
+  try {
+    payload = (await response.json()) as {
+      access_token?: unknown;
+      error?: unknown;
+    };
+  } catch {
+    console.error(
+      "[task2stock:google] token exchange failed",
+      response.status,
+      "non_json",
+    );
     return null;
   }
 
-  const payload = (await response.json()) as { access_token?: unknown };
+  if (!response.ok) {
+    const googleError =
+      typeof payload.error === "string" ? payload.error : "unknown";
+    console.error(
+      "[task2stock:google] token exchange failed",
+      response.status,
+      googleError,
+    );
+    return null;
+  }
+
   const accessToken =
     typeof payload.access_token === "string" ? payload.access_token : "";
 
@@ -169,4 +259,8 @@ export async function readGoogleProfile(
     "Google user";
 
   return { email, name };
+}
+
+export function logGoogleCallback(reason: string) {
+  console.error("[task2stock:google] callback failed", reason);
 }

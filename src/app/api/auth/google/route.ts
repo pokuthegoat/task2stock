@@ -9,6 +9,7 @@ import {
   isGoogleConfigured,
   oauthCookieOptions,
   oauthReturnPath,
+  sealOAuthState,
 } from "@/lib/auth/google";
 
 export const runtime = "nodejs";
@@ -25,7 +26,8 @@ export async function GET(request: Request) {
     );
   }
 
-  const { state, verifier, challenge } = createGoogleOAuthChallenge();
+  const { verifier, challenge } = createGoogleOAuthChallenge();
+  const state = sealOAuthState({ verifier, nextPath });
   const expires = new Date(Date.now() + OAUTH_TTL_MS);
   const response = NextResponse.redirect(
     buildGoogleAuthorizationUrl({ origin, state, challenge }),
