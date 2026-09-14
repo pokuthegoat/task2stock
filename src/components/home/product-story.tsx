@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { LoopVisual, type LoopStage } from "@/components/home/loop-visual";
 import { PageContainer } from "@/components/ui/page-container";
+import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 
 const steps: Array<{
@@ -27,13 +28,18 @@ const steps: Array<{
   },
   {
     stage: "verified",
-    title: "Get verified",
-    copy: "Your submission is reviewed and verified.",
+    title: "Pending verification",
+    copy: "Your submission is reviewed. Verification is not automatic.",
   },
   {
     stage: "reward",
     title: "Earn stocks",
     copy: "Once verified, your stock reward is issued.",
+  },
+  {
+    stage: "own",
+    title: "Build ownership",
+    copy: "Issued rewards collect as a record of work — ownership as the destination of the loop.",
   },
 ];
 
@@ -109,11 +115,13 @@ export function ProductStory() {
   return (
     <section id="how-it-works" className="section-lift py-16 md:py-24">
       <PageContainer>
-        <SectionHeading
-          eyebrow="How it works"
-          title="Action becomes a stock reward."
-          description="The same product interface, from choosing a task to owning the reward."
-        />
+        <Reveal>
+          <SectionHeading
+            eyebrow="How it works"
+            title="Action becomes a stock reward."
+            description="The same product interface, from choosing a task to owning the reward."
+          />
+        </Reveal>
 
         <div className="mt-14 grid gap-10 lg:grid-cols-2 lg:items-stretch lg:gap-16">
           <div className="hidden lg:block">

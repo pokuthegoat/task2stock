@@ -16,9 +16,9 @@ export function FeaturedTasks({ tasks }: { tasks: TaskView[] }) {
           />
         </Reveal>
         <Reveal className="mt-12">
-          <div className="grid gap-px overflow-hidden rounded-[22px] border border-white/8 bg-white/8 md:grid-cols-2">
+          <div className="home-task-grid grid gap-px overflow-hidden rounded-[22px] border border-white/8 bg-white/8 md:grid-cols-2">
             {tasks.map((task) => (
-              <TaskCard key={task.id} task={task} />
+              <TaskCard key={task.id} task={task} motion />
             ))}
           </div>
         </Reveal>

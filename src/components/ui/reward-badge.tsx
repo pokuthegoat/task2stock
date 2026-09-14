@@ -4,12 +4,14 @@ import type { RewardOffer } from "@/lib/domain/model";
 export function RewardBadge({
   offer,
   example = false,
+  motion = false,
 }: {
   offer: RewardOffer | TaskView["reward"];
   example?: boolean;
+  motion?: boolean;
 }) {
   return (
-    <span className="inline-flex items-center gap-2">
+    <span className={`inline-flex items-center gap-2 ${motion ? "reward-enter" : ""}`}>
       <span className="font-medium tracking-tight text-accent">
         {formatRewardOffer(offer)}
       </span>

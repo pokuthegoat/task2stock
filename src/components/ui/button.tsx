@@ -12,10 +12,11 @@ type ButtonProps = {
 
 const variants = {
   primary:
-    "border-accent/40 bg-accent/92 text-[#161513] hover:scale-[1.02] hover:bg-white hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]",
+    "btn-glass border-white/30 bg-accent/74 text-[#161513] shadow-[inset_0_1px_0_rgba(255,255,255,0.46)] hover:border-white/40 hover:bg-accent/88",
   secondary:
-    "border-white/14 bg-white/[0.06] text-foreground backdrop-blur-md hover:scale-[1.02] hover:border-white/22 hover:bg-white/[0.1]",
-  ghost: "border-transparent bg-transparent text-foreground/70 hover:text-foreground",
+    "btn-glass border-white/14 bg-white/[0.08] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] hover:border-white/22 hover:bg-white/[0.14]",
+  ghost:
+    "border-transparent bg-transparent text-foreground/70 hover:bg-white/[0.05] hover:text-foreground",
 };
 
 export function Button({
@@ -27,7 +28,7 @@ export function Button({
   type = "button",
   disabled = false,
 }: ButtonProps) {
-  const classes = `inline-flex h-11 items-center justify-center rounded-full border px-5 text-sm font-medium tracking-tight shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] transition duration-300 ${variants[variant]} ${disabled ? "pointer-events-none opacity-50" : ""} ${className}`;
+  const classes = `inline-flex h-11 items-center justify-center rounded-full border px-5 text-sm font-medium tracking-tight transition duration-300 ${variants[variant]} ${disabled ? "pointer-events-none opacity-50" : ""} ${className}`;
 
   if (href) {
     const isAppPath =

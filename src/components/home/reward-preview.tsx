@@ -19,7 +19,7 @@ export function RewardPreview({ items }: { items: HomeRewardPreview[] }) {
         <Reveal className="mt-12">
           <ul className="divide-y divide-white/8 border-y border-white/8">
             {items.map((item) => (
-              <li key={item.taskId}>
+              <li key={item.taskId} className="reward-row">
                 <Link
                   href={`/tasks/${item.taskId}`}
                   className="flex flex-col gap-3 py-6 transition-colors hover:text-accent sm:flex-row sm:items-center sm:justify-between"
@@ -30,7 +30,7 @@ export function RewardPreview({ items }: { items: HomeRewardPreview[] }) {
                       {item.title}
                     </p>
                   </div>
-                  <RewardBadge offer={item.offer} example={false} />
+                  <RewardBadge offer={item.offer} example={false} motion />
                 </Link>
               </li>
             ))}

@@ -1,3 +1,4 @@
+import { BrandMark } from "@/components/site/brand-mark";
 import { GlassSurface } from "@/components/ui/glass-surface";
 
 export const storyStages = [
@@ -6,9 +7,19 @@ export const storyStages = [
   "proof",
   "verified",
   "reward",
+  "own",
 ] as const;
 
 export type LoopStage = (typeof storyStages)[number];
+
+const labels: Record<LoopStage, string> = {
+  find: "Task",
+  complete: "Action",
+  proof: "Proof",
+  verified: "Verification",
+  reward: "Stock reward",
+  own: "Ownership",
+};
 
 function StateBlock({
   active,
@@ -49,15 +60,7 @@ export function LoopVisual({ stage }: { stage: LoopStage }) {
         ))}
       </div>
 
-      <p className="label mt-7">
-        {index <= 1
-          ? "Task"
-          : index === 2
-            ? "Proof"
-            : index === 3
-              ? "Verification"
-              : "Reward"}
-      </p>
+      <p className="label mt-7">{labels[stage]}</p>
       <p className="mt-3 text-lg font-medium tracking-tight text-foreground">
         Run 20 kilometers this month
       </p>
@@ -69,11 +72,13 @@ export function LoopVisual({ stage }: { stage: LoopStage }) {
         Northstar Athletics
       </p>
 
-      <div className="relative mt-6 grid min-h-[168px]">
+      <div className="relative mt-6 grid min-h-[176px]">
         <StateBlock active={index === 0}>
-          <div className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-4">
-            <p className="text-sm font-medium text-foreground">Waiting to start</p>
-            <p className="mt-1 text-xs text-foreground/42">Open the run page</p>
+          <div className="story-pop rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-4">
+            <p className="text-sm font-medium text-foreground">Available</p>
+            <p className="mt-1 text-xs text-foreground/42">
+              An open opportunity in the catalog
+            </p>
           </div>
         </StateBlock>
 
@@ -81,7 +86,7 @@ export function LoopVisual({ stage }: { stage: LoopStage }) {
           <div>
             <div className="flex items-end justify-between gap-4">
               <p className="text-sm font-medium text-foreground">16 / 20 km</p>
-              <p className="text-xs text-foreground/40">Logged</p>
+              <p className="text-xs text-foreground/40">In progress</p>
             </div>
             <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10">
               <div
@@ -93,14 +98,14 @@ export function LoopVisual({ stage }: { stage: LoopStage }) {
         </StateBlock>
 
         <StateBlock active={index === 2}>
-          <div className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-4">
+          <div className="story-slide rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-4">
             <p className="text-sm font-medium text-foreground">
               <span className="mr-1.5 text-accent">✓</span>
-              Run completed
+              Task completed
             </p>
             <div className="mt-3 flex items-center justify-between gap-3 border-t border-white/8 pt-3">
               <p className="text-xs text-foreground/55">proof.jpg</p>
-              <p className="text-xs text-accent">Submit proof →</p>
+              <p className="text-xs text-accent">Submitted</p>
             </div>
           </div>
         </StateBlock>
@@ -108,27 +113,48 @@ export function LoopVisual({ stage }: { stage: LoopStage }) {
         <StateBlock active={index === 3}>
           <div className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-4">
             <p className="text-sm font-medium text-foreground">
-              <span className="mr-1.5 text-accent">✓</span>
-              Proof received
+              Pending verification
             </p>
-            <p className="mt-1 text-xs text-foreground/42">
-              Reviewing submission...
+            <p className="story-pending mt-1 text-xs text-foreground/42">
+              Review in progress — not automatic
             </p>
           </div>
         </StateBlock>
 
         <StateBlock active={index === 4}>
+          <div className="story-reward flex items-center gap-3">
+            <BrandMark size={36} className="rounded-xl" />
+            <div>
+              <p className="text-2xl font-medium tracking-tight text-accent">
+                + $15 NVDA
+              </p>
+              <p className="mt-1 text-xs text-foreground/40">
+                Catalog example. Settlement is not live.
+              </p>
+            </div>
+          </div>
+        </StateBlock>
+
+        <StateBlock active={index === 5}>
           <div>
-            <p className="text-2xl font-medium tracking-tight text-accent">
-              + $15 NVDA
-            </p>
-            <div className="mt-5 border-t border-white/8 pt-4">
-              <p className="label">Portfolio</p>
-              <div className="mt-2 flex items-center justify-between gap-3">
+            <p className="label">Illustration</p>
+            <div className="mt-3 space-y-2">
+              <div className="story-own-row flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5">
                 <p className="text-sm font-medium text-foreground">NVDA</p>
-                <p className="text-sm font-medium text-foreground">$15</p>
+                <p className="text-sm text-accent">$15</p>
+              </div>
+              <div className="flex items-center justify-between rounded-xl border border-dashed border-white/10 px-3 py-2.5">
+                <p className="text-sm text-foreground/35">Next reward</p>
+                <p className="text-sm text-foreground/28">—</p>
+              </div>
+              <div className="flex items-center justify-between rounded-xl border border-dashed border-white/10 px-3 py-2.5">
+                <p className="text-sm text-foreground/35">Collects over time</p>
+                <p className="text-sm text-foreground/28">—</p>
               </div>
             </div>
+            <p className="mt-3 text-[11px] leading-4 text-foreground/38">
+              Narrative only — not a live portfolio.
+            </p>
           </div>
         </StateBlock>
       </div>

@@ -5,9 +5,11 @@ import type { TaskView } from "@/lib/data";
 export function TaskCard({
   task,
   badge,
+  motion = false,
 }: {
   task: TaskView;
   badge?: string;
+  motion?: boolean;
 }) {
   return (
     <Link
@@ -33,7 +35,7 @@ export function TaskCard({
       </p>
       <div className="mt-8 flex items-end justify-between gap-4 border-t border-white/8 pt-5">
         <div>
-          <RewardBadge offer={task.reward} example={false} />
+          <RewardBadge offer={task.reward} example={false} motion={motion} />
           <p className="mt-2 text-xs font-medium text-foreground/40">
             {task.timeBucket} · {task.difficulty}
           </p>

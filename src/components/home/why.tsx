@@ -28,10 +28,10 @@ export function Why() {
             description="The idea is simple. Do the task. Earn a stock-oriented reward. No return promises, and no live market claims."
           />
         </Reveal>
-        <Reveal className="mt-14">
-          <ol className="grid gap-10 md:grid-cols-3 md:gap-8">
-            {points.map((point, index) => (
-              <li key={point.title}>
+        <ol className="mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
+          {points.map((point, index) => (
+            <li key={point.title}>
+              <Reveal delay={index * 90}>
                 <p className="label">{String(index + 1).padStart(2, "0")}</p>
                 <h3 className="heading mt-4 text-2xl text-foreground">
                   {point.title}
@@ -39,10 +39,10 @@ export function Why() {
                 <p className="mt-3 text-sm leading-6 text-foreground/55">
                   {point.copy}
                 </p>
-              </li>
-            ))}
-          </ol>
-        </Reveal>
+              </Reveal>
+            </li>
+          ))}
+        </ol>
       </PageContainer>
     </section>
   );
