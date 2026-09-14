@@ -36,21 +36,12 @@ export default async function AccountPage() {
           <div className="border-t border-white/8 pt-8">
             <p className="label">Profile</p>
             <h2 className="heading mt-3 text-3xl text-foreground">
-              {session.user.walletAddress ? "Wallet and name" : "Name and email"}
+              Name and email
             </h2>
             <p className="mt-4 text-sm leading-6 text-foreground/58">
-              {session.user.walletAddress
-                ? "This account signed in with Phantom. You can update the name shown in the app."
-                : "Email stays with this account. You can update the name shown in the app."}
+              Email stays with this account. You can update the name shown in
+              the app.
             </p>
-            {session.user.walletAddress ? (
-              <div className="mt-6 border-t border-white/8 pt-5">
-                <p className="label">Wallet</p>
-                <p className="mt-2 break-all font-mono text-sm font-medium text-foreground">
-                  {session.user.walletAddress}
-                </p>
-              </div>
-            ) : null}
             {session.user.email ? (
               <div className="mt-6 border-t border-white/8 pt-5">
                 <p className="label">Email</p>
@@ -60,7 +51,7 @@ export default async function AccountPage() {
               </div>
             ) : null}
             <div className="mt-6">
-              <AccountNameForm name={session.user.name} />
+              <AccountNameForm key={session.user.name} name={session.user.name} />
             </div>
           </div>
 
@@ -81,11 +72,11 @@ export default async function AccountPage() {
             ) : (
               <>
                 <h2 className="heading mt-3 text-3xl text-foreground">
-                  Phantom
+                  Google
                 </h2>
                 <p className="mt-4 text-sm leading-6 text-foreground/58">
-                  This account signs in with Phantom. Password sign-in is not
-                  set, and wallets are not linked to email accounts.
+                  This account signs in with Google. A local password is not
+                  set.
                 </p>
               </>
             )}

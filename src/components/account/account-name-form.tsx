@@ -21,10 +21,6 @@ export function AccountNameForm({
   );
 
   useEffect(() => {
-    setName(initialName);
-  }, [initialName]);
-
-  useEffect(() => {
     if (state.ok) {
       router.refresh();
     }

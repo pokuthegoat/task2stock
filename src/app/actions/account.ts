@@ -66,6 +66,14 @@ export async function changeAccountPasswordAction(
     return unauthenticated();
   }
 
+  if (!session.user.hasPassword) {
+    return {
+      ok: false,
+      errors: {},
+      message: "This account signs in with Google. A local password is not set.",
+    };
+  }
+
   const currentPassword = readField(formData, "currentPassword");
   const password = readField(formData, "password");
   const confirmPassword = readField(formData, "confirmPassword");

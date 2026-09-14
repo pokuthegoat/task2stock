@@ -1,35 +1,20 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 import { changeAccountPasswordAction } from "@/app/actions/account";
 import { AuthField } from "@/components/auth/auth-field";
 import { FormMessage } from "@/components/auth/form-message";
 import { Button } from "@/components/ui/button";
+import type { FieldErrors } from "@/lib/auth/types";
 import { initialAuthFormState } from "@/lib/auth/types";
 
-export function AccountPasswordForm() {
+function PasswordFields({ errors }: { errors: FieldErrors }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [state, formAction, pending] = useActionState(
-    changeAccountPasswordAction,
-    initialAuthFormState,
-  );
-
-  useEffect(() => {
-    if (state.ok) {
-      setCurrentPassword("");
-      setPassword("");
-      setConfirmPassword("");
-    }
-  }, [state]);
 
   return (
-    <form action={formAction} noValidate className="space-y-5">
-      <FormMessage
-        message={state.message}
-        tone={state.ok ? "success" : "error"}
-      />
+    <>
       <AuthField
         id="current-password"
         name="currentPassword"
@@ -38,7 +23,7 @@ export function AccountPasswordForm() {
         autoComplete="current-password"
         value={currentPassword}
         onChange={setCurrentPassword}
-        error={state.errors.currentPassword}
+        error={errors.currentPassword}
       />
       <AuthField
         id="new-password"
@@ -48,7 +33,7 @@ export function AccountPasswordForm() {
         autoComplete="new-password"
         value={password}
         onChange={setPassword}
-        error={state.errors.password}
+        error={errors.password}
       />
       <AuthField
         id="confirm-new-password"
@@ -58,7 +43,27 @@ export function AccountPasswordForm() {
         autoComplete="new-password"
         value={confirmPassword}
         onChange={setConfirmPassword}
-        error={state.errors.confirmPassword}
+        error={errors.confirmPassword}
+      />
+    </>
+  );
+}
+
+export function AccountPasswordForm() {
+  const [state, formAction, pending] = useActionState(
+    changeAccountPasswordAction,
+    initialAuthFormState,
+  );
+
+  return (
+    <form action={formAction} noValidate className="space-y-5">
+      <FormMessage
+        message={state.message}
+        tone={state.ok ? "success" : "error"}
+      />
+      <PasswordFields
+        key={state.ok ? "cleared" : "idle"}
+        errors={state.errors}
       />
       <Button type="submit" disabled={pending}>
         Change password

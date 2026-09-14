@@ -30,7 +30,10 @@ export function Button({
   const classes = `inline-flex h-11 items-center justify-center rounded-full border px-5 text-sm font-medium tracking-tight shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] transition duration-300 ${variants[variant]} ${disabled ? "pointer-events-none opacity-50" : ""} ${className}`;
 
   if (href) {
-    const isAppPath = href.startsWith("/") && !href.includes("#");
+    const isAppPath =
+      href.startsWith("/") &&
+      !href.startsWith("/api/") &&
+      !href.includes("#");
 
     if (isAppPath) {
       return (

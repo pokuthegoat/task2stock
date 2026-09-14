@@ -12,15 +12,15 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "db:status": "prisma migrate status",
-    "db:check": "tsx scripts/validate-db.ts"
+    "db:check": "tsx scripts/validate-db.ts",
+    "db:turso-migrate": "tsx scripts/apply-turso-migrations.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
-    "@noble/curves": "^2.4.0",
+    "@prisma/adapter-libsql": "6.19.3",
     "@prisma/client": "^6.19.3",
-    "@scure/base": "^2.4.0",
     "next": "16.3.5",
     "react": "19.2.8",
     "react-dom": "19.2.8",

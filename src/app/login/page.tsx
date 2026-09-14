@@ -3,18 +3,25 @@ import { redirect } from "next/navigation";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { LoginForm } from "@/components/auth/login-form";
 import { getSession } from "@/lib/auth/session";
+import { googleAuthErrorMessage } from "@/lib/auth/validation";
 
 export const metadata: Metadata = {
   title: "Sign in — Task2Stock",
-  description: "Sign in to Task2Stock with Phantom or email and password.",
+  description: "Sign in to Task2Stock with Google or email and password.",
 };
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   const session = await getSession();
 
   if (session) {
     redirect("/tasks");
   }
+
+  const { error } = await searchParams;
 
   return (
     <main id="main" className="section-base flex-1">
@@ -22,9 +29,9 @@ export default async function LoginPage() {
         <AuthShell
           eyebrow="Account"
           title="Welcome back"
-          description="Connect Phantom to sign in. Email and password remain available as a fallback."
+          description="Continue with Google or sign in with your email and password."
         >
-          <LoginForm />
+          <LoginForm notice={googleAuthErrorMessage(error)} />
         </AuthShell>
       </section>
     </main>

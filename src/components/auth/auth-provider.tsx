@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { signOutAction } from "@/app/actions/auth";
 import type { AuthUser } from "@/lib/auth/types";
@@ -20,22 +20,16 @@ export function AuthProvider({
   initialUser: AuthUser | null;
 }) {
   const router = useRouter();
-  const [user, setUser] = useState<AuthUser | null>(initialUser);
-
-  useEffect(() => {
-    setUser(initialUser);
-  }, [initialUser]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
-      user,
+      user: initialUser,
       async signOut() {
         await signOutAction();
-        setUser(null);
         router.refresh();
       },
     }),
-    [router, user],
+    [initialUser, router],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

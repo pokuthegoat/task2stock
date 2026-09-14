@@ -14,27 +14,15 @@ model User {
   id            String   @id
   name          String
   email         String?  @unique
-  /// scrypt hash for email/password accounts. Null for wallet-only users.
+  /// scrypt hash for email/password accounts. Null for Google-only users.
   passwordHash  String?
+  /// Unused by current auth. Kept to preserve existing rows.
   walletAddress String?  @unique
   createdAt     DateTime @default(now())
 
   sessions AuthSession[]
   rewards  Reward[]
   holdings Holding[]
-}
-
-/// One-time Phantom sign-in challenge. Never store wallet secrets.
-model WalletAuthChallenge {
-  id            String    @id
-  nonce         String    @unique
-  walletAddress String
-  message       String
-  expiresAt     DateTime
-  consumedAt    DateTime?
-  createdAt     DateTime  @default(now())
-
-  @@index([expiresAt])
 }
 
 /// Opaque server session. Cookie stores only this id.

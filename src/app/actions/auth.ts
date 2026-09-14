@@ -13,7 +13,6 @@ import {
   validateLogin,
   validateSignup,
 } from "@/lib/auth/validation";
-import { beginWalletAuth, completeWalletAuth } from "@/lib/auth/wallet";
 
 function readField(formData: FormData, key: string) {
   return String(formData.get(key) ?? "");
@@ -59,25 +58,6 @@ export async function signUpAction(
 
   if (!result.ok) {
     return { ok: false, errors: {}, message: result.message };
-  }
-
-  revalidatePath("/", "layout");
-  redirect("/tasks");
-}
-
-export async function beginWalletAuthAction(walletAddress: string) {
-  return beginWalletAuth(walletAddress);
-}
-
-export async function completeWalletAuthAction(input: {
-  challengeId: string;
-  publicKey: string;
-  signature: string;
-}) {
-  const result = await completeWalletAuth(input);
-
-  if (!result.ok) {
-    return { ok: false as const, error: result.message };
   }
 
   revalidatePath("/", "layout");

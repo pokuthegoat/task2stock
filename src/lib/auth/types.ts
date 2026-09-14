@@ -2,7 +2,6 @@ export type AuthUser = {
   id: string;
   name: string;
   email: string | null;
-  walletAddress: string | null;
   hasPassword: boolean;
 };
 
@@ -14,11 +13,7 @@ export type AuthResult =
   | { ok: true; user: AuthUser }
   | {
       ok: false;
-      code:
-        | "VALIDATION"
-        | "WALLET"
-        | "INVALID_CREDENTIALS"
-        | "EMAIL_TAKEN";
+      code: "VALIDATION" | "INVALID_CREDENTIALS" | "EMAIL_TAKEN" | "UNAVAILABLE";
       message: string;
     };
 

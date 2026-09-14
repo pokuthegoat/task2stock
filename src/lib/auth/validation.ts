@@ -1,7 +1,5 @@
 import type { FieldErrors } from "@/lib/auth/types";
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export function validateName(value: string): string | undefined {
   const name = value.trim();
   if (!name) return "Enter your name.";
@@ -12,7 +10,9 @@ export function validateName(value: string): string | undefined {
 export function validateEmail(value: string): string | undefined {
   const email = value.trim();
   if (!email) return "Enter your email.";
-  if (!emailPattern.test(email)) return "Enter a valid email address.";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return "Enter a valid email address.";
+  }
   return undefined;
 }
 
@@ -80,4 +80,19 @@ export function validateSignup(input: {
 
 export function hasFieldErrors(errors: FieldErrors): boolean {
   return Object.values(errors).some(Boolean);
+}
+
+export function googleAuthErrorMessage(code: string | undefined) {
+  switch (code) {
+    case "google_cancelled":
+      return "Google sign-in was cancelled.";
+    case "google_unavailable":
+      return "Google sign-in is not configured.";
+    case "google_email":
+      return "Google did not provide a verified email address.";
+    case "google_failed":
+      return "Google sign-in failed. Try again.";
+    default:
+      return null;
+  }
 }

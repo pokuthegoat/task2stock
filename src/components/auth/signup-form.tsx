@@ -5,12 +5,15 @@ import { useActionState, useState } from "react";
 import { hasFieldErrors } from "@/lib/auth/validation";
 import { signUpAction } from "@/app/actions/auth";
 import { AuthField } from "@/components/auth/auth-field";
+import {
+  AuthMethodDivider,
+  GoogleContinueButton,
+} from "@/components/auth/google-continue-button";
 import { FormMessage } from "@/components/auth/form-message";
-import { PhantomConnect } from "@/components/auth/phantom-connect";
 import { Button } from "@/components/ui/button";
 import { initialAuthFormState } from "@/lib/auth/types";
 
-export function SignupForm() {
+export function SignupForm({ notice = null }: { notice?: string | null }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,19 +22,13 @@ export function SignupForm() {
     signUpAction,
     initialAuthFormState,
   );
-  const notice = hasFieldErrors(state.errors) ? null : state.message;
+  const message = hasFieldErrors(state.errors) ? null : state.message ?? notice;
 
   return (
     <div className="space-y-5">
-      <PhantomConnect />
-
-      <div className="flex items-center gap-4">
-        <span className="h-px flex-1 bg-white/8" />
-        <span className="text-xs text-foreground/35">or</span>
-        <span className="h-px flex-1 bg-white/8" />
-      </div>
-
-      <FormMessage message={notice} />
+      <GoogleContinueButton />
+      <AuthMethodDivider />
+      <FormMessage message={message} />
 
       <form action={formAction} noValidate className="space-y-5">
         <AuthField

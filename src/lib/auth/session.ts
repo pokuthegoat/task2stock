@@ -3,8 +3,8 @@ import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { cache } from "react";
 import { cookies } from "next/headers";
+import type { AuthUser, Session } from "@/lib/auth/types";
 import { getPrisma } from "@/lib/data/db/client";
-import type { Session } from "@/lib/auth/types";
 
 export const SESSION_COOKIE = "t2s_session";
 const SESSION_DAYS = 30;
@@ -27,6 +27,43 @@ function sessionCookieOptions(expires: Date) {
   };
 }
 
+export function toAuthUser(user: {
+  id: string;
+  name: string;
+  email: string | null;
+  passwordHash?: string | null;
+}): AuthUser {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    hasPassword: Boolean(user.passwordHash),
+  };
+}
+
+export function sessionCookie(token: string, expires: Date) {
+  return {
+    name: SESSION_COOKIE,
+    value: token,
+    ...sessionCookieOptions(expires),
+  };
+}
+
+export async function persistSessionRow(userId: string) {
+  const token = randomBytes(32).toString("hex");
+  const expiresAt = sessionExpiry();
+
+  await getPrisma().authSession.create({
+    data: {
+      id: hashSessionToken(token),
+      userId,
+      expiresAt,
+    },
+  });
+
+  return { token, expiresAt };
+}
+
 /**
  * Server-side session reader.
  * Looks up the httpOnly session cookie against AuthSession + User.
@@ -46,7 +83,6 @@ export const getSession = cache(async (): Promise<Session | null> => {
           id: true,
           name: true,
           email: true,
-          walletAddress: true,
           passwordHash: true,
         },
       },
@@ -62,33 +98,13 @@ export const getSession = cache(async (): Promise<Session | null> => {
   }
 
   return {
-    user: {
-      id: row.user.id,
-      name: row.user.name,
-      email: row.user.email,
-      walletAddress: row.user.walletAddress,
-      hasPassword: Boolean(row.user.passwordHash),
-    },
+    user: toAuthUser(row.user),
   };
 });
 
 export async function createSession(userId: string): Promise<void> {
-  const token = randomBytes(32).toString("hex");
-  const expiresAt = sessionExpiry();
-
-  await getPrisma().authSession.create({
-    data: {
-      id: hashSessionToken(token),
-      userId,
-      expiresAt,
-    },
-  });
-
-  (await cookies()).set({
-    name: SESSION_COOKIE,
-    value: token,
-    ...sessionCookieOptions(expiresAt),
-  });
+  const { token, expiresAt } = await persistSessionRow(userId);
+  (await cookies()).set(sessionCookie(token, expiresAt));
 }
 
 /** Drop every session for a user, then issue a new cookie for this request. */

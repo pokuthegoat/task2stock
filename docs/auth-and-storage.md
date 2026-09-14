@@ -12,13 +12,58 @@ Override only if needed:
 NEXT_PUBLIC_CONTACT_EMAIL=task2stock@gmail.com
 ```
 
-## Phantom wallet authentication
+## Authentication
 
-`/login` and `/signup` use Phantom as the primary sign-in option. Email and password remain a fallback.
+Task2Stock authenticates with Google OAuth and email/password. Both methods create the same `t2s_session` cookie against the `AuthSession` table.
 
-No API key or third-party auth provider is required. The server creates a one-time nonce, Phantom signs a Task2Stock message, and the server verifies the Ed25519 signature before creating the existing `t2s_session` cookie.
+Required Google environment variables:
 
-Wallet-only users are stored with `walletAddress` and do not receive a password or a synthetic email. Wallets are not linked to existing email/password accounts.
+```
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+```
+
+`GOOGLE_CLIENT_SECRET` is server-only. Do not prefix it with `NEXT_PUBLIC_`.
+
+Google OAuth callback path implemented by the app:
+
+```
+/api/auth/google/callback
+```
+
+Local callback URL:
+
+```
+http://localhost:3000/api/auth/google/callback
+```
+
+Production callback URL:
+
+```
+https://task2stock.vercel.app/api/auth/google/callback
+```
+
+Add both as authorized redirect URIs in Google Cloud. Add `http://localhost:3000` and `https://task2stock.vercel.app` as authorized JavaScript origins.
+
+Passwords are hashed with scrypt. Google-only accounts have no local password.
+
+## Production database (Vercel)
+
+Local development uses `DATABASE_URL="file:./dev.db"`. That file database cannot persist user accounts on Vercel.
+
+Required Vercel environment variables:
+
+```
+TURSO_DATABASE_URL=libsql://YOUR-DB-YOUR-ORG.turso.io
+TURSO_AUTH_TOKEN=YOUR-TURSO-TOKEN
+DATABASE_URL=file:./dev.db
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+```
+
+`DATABASE_URL` stays as the local SQLite placeholder so Prisma can resolve the schema. Runtime queries on Vercel go through Turso when the two `TURSO_*` variables are set.
+
+Apply existing `prisma/migrations` to the Turso database before production signup. Catalog reads can still use fixtures (`DATA_SOURCE` unset). Auth needs the migrated `User` and `AuthSession` tables.
 
 ## Proof file storage
 
