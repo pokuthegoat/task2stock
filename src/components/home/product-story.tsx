@@ -1,119 +1,144 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { LoopVisual, type LoopStage } from "@/components/home/loop-visual";
+import Image from "next/image";
+import { useEffect, useRef } from "react";
 import { PageContainer } from "@/components/ui/page-container";
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
 
-const steps: Array<{
-  stage: LoopStage;
-  title: string;
-  copy: string;
-}> = [
+const steps = [
   {
-    stage: "find",
     title: "Find a task",
     copy: "Browse tasks and choose one you want to complete.",
+    poster: "/posters/poster 1.png",
   },
   {
-    stage: "complete",
     title: "Complete it",
     copy: "Follow the requirements and finish the task.",
+    poster: "/posters/poster 2.png",
   },
   {
-    stage: "proof",
     title: "Submit proof",
     copy: "Send evidence showing that you completed it.",
+    poster: "/posters/poster 3.png",
   },
   {
-    stage: "verified",
     title: "Pending verification",
     copy: "Your submission is reviewed. Verification is not automatic.",
+    poster: "/posters/poster 4.png",
   },
   {
-    stage: "reward",
     title: "Earn stocks",
     copy: "Once verified, your stock reward is issued.",
+    poster: "/posters/poster 5.png",
   },
   {
-    stage: "own",
     title: "Build ownership",
     copy: "Issued rewards collect as a record of work — ownership as the destination of the loop.",
+    poster: "/posters/poster 6.png",
   },
-];
+] as const;
 
-function readActiveIndex(nodes: HTMLElement[], current: number) {
-  const line = window.innerHeight * 0.42;
-  const currentNode = nodes[current];
+function StoryChapter({
+  step,
+  index,
+}: {
+  step: (typeof steps)[number];
+  index: number;
+}) {
+  const ref = useRef<HTMLElement>(null);
+  const posterOnLeft = index % 2 === 1;
+  const number = String(index + 1).padStart(2, "0");
 
-  if (currentNode) {
-    const rect = currentNode.getBoundingClientRect();
-    if (rect.top <= line && rect.bottom >= line) {
-      return current;
-    }
-  }
+  useEffect(() => {
+    const node = ref.current;
 
-  let next = current;
-  let best = Number.POSITIVE_INFINITY;
-
-  nodes.forEach((node, index) => {
-    const rect = node.getBoundingClientRect();
-
-    if (rect.top <= line && rect.bottom >= line) {
-      next = index;
-      best = 0;
+    if (!node) {
       return;
     }
 
-    const distance = rect.top > line ? rect.top - line : line - rect.bottom;
-
-    if (distance < best) {
-      best = distance;
-      next = index;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      node.classList.add("is-visible");
+      return;
     }
-  });
 
-  return next;
-}
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry) {
+          return;
+        }
 
-export function ProductStory() {
-  const [active, setActive] = useState(0);
-  const refs = useRef<Array<HTMLLIElement | null>>([]);
-  const activeRef = useRef(0);
+        const rect = entry.boundingClientRect;
+        const inView =
+          rect.top < window.innerHeight * 0.82 &&
+          rect.bottom > window.innerHeight * 0.14;
 
-  useEffect(() => {
-    const nodes = refs.current.filter((node): node is HTMLLIElement => Boolean(node));
-    let frame = 0;
+        if (!inView) {
+          return;
+        }
 
-    const measure = () => {
-      frame = 0;
-      const next = readActiveIndex(nodes, activeRef.current);
-      if (next === activeRef.current) return;
-      activeRef.current = next;
-      setActive(next);
-    };
+        node.classList.add("is-visible");
+        observer.disconnect();
+      },
+      { threshold: [0, 0.12, 0.24, 0.4], rootMargin: "0px 0px -8% 0px" },
+    );
 
-    const onScroll = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(measure);
-    };
-
-    measure();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    const start = window.requestAnimationFrame(() => {
+      observer.observe(node);
+    });
 
     return () => {
-      if (frame) window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.cancelAnimationFrame(start);
+      observer.disconnect();
     };
   }, []);
 
-  const stage = steps[active]?.stage ?? "find";
-
   return (
-    <section id="how-it-works" className="section-lift py-16 md:py-24">
+    <article
+      ref={ref}
+      className={`story-chapter grid items-center gap-10 py-16 md:gap-14 md:py-24 lg:min-h-[86vh] xl:gap-x-24 ${
+        posterOnLeft
+          ? "lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)] lg:gap-x-16"
+          : "lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:gap-x-16"
+      }`}
+    >
+      <div
+        className={`story-chapter-copy max-w-md ${
+          posterOnLeft ? "lg:order-2 lg:justify-self-end" : "lg:justify-self-start"
+        }`}
+      >
+        <p className="label text-accent">Step {number}</p>
+        <h3 className="heading mt-5 text-3xl text-foreground md:text-5xl">
+          {step.title}
+        </h3>
+        <p className="mt-5 max-w-sm text-base leading-7 text-foreground/58 md:text-lg md:leading-8">
+          {step.copy}
+        </p>
+      </div>
+
+      <div
+        className={`story-chapter-poster ${
+          posterOnLeft ? "lg:order-1" : ""
+        }`}
+      >
+        <div className="relative aspect-[896/1120] overflow-hidden rounded-[1.75rem] border border-white/16 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_28px_80px_rgba(0,0,0,0.36)]">
+          <Image
+            src={step.poster}
+            alt={step.title}
+            width={896}
+            height={1120}
+            className="h-full w-full object-contain"
+            sizes="(min-width: 1024px) 560px, 92vw"
+          />
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export function ProductStory() {
+  return (
+    <section id="how-it-works" className="section-lift py-20 md:py-28">
       <PageContainer>
         <Reveal>
           <SectionHeading
@@ -124,54 +149,10 @@ export function ProductStory() {
           />
         </Reveal>
 
-        <div className="mt-14 grid gap-10 lg:grid-cols-2 lg:items-stretch lg:gap-16">
-          <div className="hidden lg:block">
-            <div className="sticky top-28">
-              <LoopVisual stage={stage} />
-            </div>
-          </div>
-
-          <ol className="lg:py-2">
-            {steps.map((step, index) => (
-              <li
-                key={step.stage}
-                ref={(node) => {
-                  refs.current[index] = node;
-                }}
-                className={`lg:min-h-[75vh] ${
-                  index === 0
-                    ? "pt-2"
-                    : "border-t border-white/8 pt-10 lg:border-t-0 lg:pt-0"
-                }`}
-              >
-                <div
-                  className={`relative max-w-md lg:sticky lg:top-28 lg:py-2 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
-                    active === index
-                      ? "z-[1] opacity-100"
-                      : "opacity-[0.46] lg:translate-y-1"
-                  }`}
-                >
-                  <p
-                    className={`label transition-colors duration-500 ${
-                      active === index ? "text-accent" : ""
-                    }`}
-                  >
-                    Step {String(index + 1).padStart(2, "0")}
-                  </p>
-                  <h3 className="heading mt-4 text-3xl text-foreground md:text-4xl">
-                    {step.title}
-                  </h3>
-                  <p className="mt-4 text-base leading-7 text-foreground/58">
-                    {step.copy}
-                  </p>
-                </div>
-
-                <div className="mt-8 lg:hidden">
-                  <LoopVisual stage={step.stage} />
-                </div>
-              </li>
-            ))}
-          </ol>
+        <div className="mt-10 md:mt-16">
+          {steps.map((step, index) => (
+            <StoryChapter key={step.poster} step={step} index={index} />
+          ))}
         </div>
       </PageContainer>
     </section>
