@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useLogin, usePrivy } from "@privy-io/react-auth";
-import { useRouter } from "next/navigation";
-import { completePrivySessionAction } from "@/app/actions/auth";
+import { useAuth } from "@/components/auth/auth-provider";
+import { AuthMethodDivider } from "@/components/auth/google-continue-button";
 import { Button } from "@/components/ui/button";
 
 export function PrivyLoginButton({
@@ -11,7 +9,6 @@ export function PrivyLoginButton({
   className = "",
   label = "Login with Privy",
   variant = "primary",
-  autoSync = false,
   compact = false,
 }: {
   size?: "sm" | "md" | "lg";
@@ -21,61 +18,7 @@ export function PrivyLoginButton({
   autoSync?: boolean;
   compact?: boolean;
 }) {
-  const router = useRouter();
-  const { ready, authenticated, getAccessToken } = usePrivy();
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const syncing = useRef(false);
-  const autoSynced = useRef(false);
-
-  async function syncSession() {
-    if (syncing.current) return;
-    syncing.current = true;
-    setPending(true);
-    setError(null);
-
-    try {
-      const token = await getAccessToken();
-
-      if (!token) {
-        setError("Privy did not return a session token.");
-        return;
-      }
-
-      const result = await completePrivySessionAction(token);
-
-      if (!result.ok) {
-        setError(result.error);
-        return;
-      }
-
-      router.replace(result.next);
-      router.refresh();
-    } catch {
-      setError("Privy login could not be completed. Try again.");
-    } finally {
-      syncing.current = false;
-      setPending(false);
-    }
-  }
-
-  const { login } = useLogin({
-    onComplete: () => {
-      void syncSession();
-    },
-    onError: () => {
-      setError("Privy login was cancelled or failed.");
-    },
-  });
-
-  useEffect(() => {
-    if (!autoSync || !ready || !authenticated || autoSynced.current) {
-      return;
-    }
-
-    autoSynced.current = true;
-    void syncSession();
-  }, [autoSync, ready, authenticated]);
+  const { ready, pending, error, loginWithPrivy, loginWithWallet } = useAuth();
 
   if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID) {
     return compact ? null : (
@@ -85,32 +28,35 @@ export function PrivyLoginButton({
     );
   }
 
-  const button = (
+  const loginButton = (
     <Button
       size={size}
       variant={variant}
       className={className}
       disabled={!ready || pending}
-      onClick={() => {
-        if (authenticated) {
-          void syncSession();
-          return;
-        }
-
-        login();
-      }}
+      onClick={() => loginWithPrivy()}
     >
       {pending ? "Connecting…" : label}
     </Button>
   );
 
   if (compact) {
-    return button;
+    return loginButton;
   }
 
   return (
     <div className="grid gap-3">
-      {button}
+      {loginButton}
+      <AuthMethodDivider />
+      <Button
+        size={size}
+        variant="secondary"
+        className={className}
+        disabled={!ready || pending}
+        onClick={() => loginWithWallet()}
+      >
+        {pending ? "Connecting…" : "Sign up with wallet"}
+      </Button>
       {error ? (
         <p className="text-center text-sm text-red-300/90">{error}</p>
       ) : null}

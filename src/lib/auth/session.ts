@@ -18,12 +18,15 @@ function hashSessionToken(token: string) {
 }
 
 function sessionCookieOptions(expires: Date) {
+  const maxAge = Math.floor((expires.getTime() - Date.now()) / 1000);
+
   return {
     httpOnly: true,
     sameSite: "lax" as const,
     path: "/",
     secure: process.env.NODE_ENV === "production",
     expires,
+    maxAge: maxAge > 0 ? maxAge : 0,
   };
 }
 
@@ -113,10 +116,16 @@ export async function createSession(userId: string): Promise<void> {
   (await cookies()).set(sessionCookie(token, expiresAt));
 }
 
+/** Drop every session for a user and return a fresh token. Cookie is not set. */
+export async function rotateSessionToken(userId: string) {
+  await getPrisma().authSession.deleteMany({ where: { userId } });
+  return persistSessionRow(userId);
+}
+
 /** Drop every session for a user, then issue a new cookie for this request. */
 export async function replaceSessionsForUser(userId: string): Promise<void> {
-  await getPrisma().authSession.deleteMany({ where: { userId } });
-  await createSession(userId);
+  const { token, expiresAt } = await rotateSessionToken(userId);
+  (await cookies()).set(sessionCookie(token, expiresAt));
 }
 
 export async function destroySession(): Promise<void> {

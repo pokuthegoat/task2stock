@@ -13,6 +13,14 @@ export function AppPrivyProvider({ children }: { children: React.ReactNode }) {
         appearance: {
           theme: "dark",
           accentColor: "#efe8dc",
+          walletChainType: "ethereum-only",
+          walletList: [
+            "detected_ethereum_wallets",
+            "metamask",
+            "coinbase_wallet",
+            "rainbow",
+            "wallet_connect",
+          ],
         },
         embeddedWallets: {
           ethereum: {

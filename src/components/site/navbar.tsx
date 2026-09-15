@@ -41,10 +41,10 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 py-3 md:py-4">
       <PageContainer>
-        <div className="glass-nav grid h-14 grid-cols-[1fr_auto] items-center gap-3 rounded-full pl-4 pr-2 md:grid-cols-[1fr_auto_1fr] md:px-3">
-          <Logo />
+        <div className="glass-nav grid h-14 grid-cols-[1fr_auto] items-center gap-3 rounded-full pl-4 pr-2 md:grid-cols-[auto_1fr_auto] md:px-3">
+          <Logo className="justify-self-start" />
 
-          <nav className="hidden items-center justify-center gap-1 md:flex">
+          <nav className="hidden items-center justify-center justify-self-center gap-1 md:flex">
             {links.map((link) =>
               link.href.startsWith("/#") ? (
                 <a key={link.href} href={link.href} className="nav-link">
@@ -63,7 +63,7 @@ export function Navbar() {
             )}
           </nav>
 
-          <div className="hidden items-center justify-end gap-2 md:flex">
+          <div className="hidden items-center justify-end justify-self-end gap-2 md:flex">
             <NavbarMetaButtons />
             {user ? (
               <Button

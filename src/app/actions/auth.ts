@@ -1,16 +1,16 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { afterAuthPath } from "@/lib/auth/profile-gate";
-import { verifyPrivyAccessToken } from "@/lib/auth/privy";
+import { completePrivyLogin } from "@/lib/auth/complete-privy-login";
+import { afterAuthPath } from "@/lib/auth/paths";
 import {
-  findOrCreatePrivyUser,
   signInWithPassword,
   signOut as clearSession,
   signUpWithPassword,
 } from "@/lib/auth/provider";
-import { replaceSessionsForUser } from "@/lib/auth/session";
+import { sessionCookie } from "@/lib/auth/session";
 import type { AuthFormState } from "@/lib/auth/types";
 import {
   hasFieldErrors,
@@ -73,22 +73,17 @@ export async function signOutAction() {
   revalidatePath("/", "layout");
 }
 
-export async function completePrivySessionAction(accessToken: string) {
-  try {
-    const identity = await verifyPrivyAccessToken(accessToken);
-    const result = await findOrCreatePrivyUser(identity);
+export async function completePrivySessionAction(
+  accessToken: string,
+  identityToken?: string | null,
+) {
+  const result = await completePrivyLogin({ accessToken, identityToken });
 
-    if (!result.ok) {
-      return { ok: false as const, error: result.message };
-    }
-
-    await replaceSessionsForUser(result.user.id);
-    revalidatePath("/", "layout");
-    return { ok: true as const, next: afterAuthPath(result.user) };
-  } catch {
-    return {
-      ok: false as const,
-      error: "Privy login could not be verified. Try again.",
-    };
+  if (!result.ok) {
+    return result;
   }
+
+  (await cookies()).set(sessionCookie(result.token, result.expiresAt));
+  revalidatePath("/", "layout");
+  return { ok: true as const, next: result.next };
 }
