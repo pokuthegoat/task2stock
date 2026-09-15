@@ -3,8 +3,8 @@
 :root {
   --background: #0e0e13;
   --foreground: #f7f6f2;
-  --muted: rgba(247, 246, 242, 0.66);
-  --faint: rgba(247, 246, 242, 0.46);
+  --muted: rgba(247, 246, 242, 0.76);
+  --faint: rgba(247, 246, 242, 0.56);
   --line: rgba(255, 255, 255, 0.1);
   --line-strong: rgba(255, 255, 255, 0.2);
   --accent: #efe8dc;
@@ -177,6 +177,7 @@ body {
 }
 
 .glass-tile {
+  position: relative;
   border-radius: var(--r-lg);
   backdrop-filter: blur(22px) saturate(145%);
   -webkit-backdrop-filter: blur(22px) saturate(145%);
@@ -197,6 +198,198 @@ body {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.2),
     0 22px 54px rgba(0, 0, 0, 0.3);
+}
+
+.pointer-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    240px 180px at var(--spot-x, 50%) var(--spot-y, 0%),
+    rgba(255, 255, 255, 0.16),
+    transparent 62%
+  );
+  transition: opacity 220ms ease;
+}
+
+.glass-tile-hover:hover > .pointer-glow {
+  opacity: 1;
+}
+
+.filter-chip {
+  color: rgba(247, 246, 242, 0.66);
+}
+
+.filter-chip:hover {
+  color: var(--foreground);
+  filter: brightness(1.08);
+}
+
+.filter-chip[aria-pressed="true"] {
+  color: var(--foreground);
+  border-color: var(--line-strong);
+  background-image:
+    radial-gradient(
+      120% 78% at 12% -14%,
+      rgba(255, 255, 255, 0.18),
+      transparent 58%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.16),
+      rgba(255, 255, 255, 0.07)
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    0 8px 22px rgba(0, 0, 0, 0.18);
+}
+
+.task-accent-edge::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  bottom: 18px;
+  left: 0;
+  z-index: 2;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: var(--task-accent, rgba(239, 232, 220, 0.7));
+  box-shadow: 0 0 18px color-mix(in srgb, var(--task-accent) 45%, transparent);
+}
+
+.task-still {
+  position: relative;
+  overflow: hidden;
+  height: 148px;
+  background:
+    radial-gradient(
+      90% 120% at 78% 20%,
+      color-mix(in srgb, var(--task-accent) 28%, transparent),
+      transparent 58%
+    ),
+    radial-gradient(80% 90% at 8% 90%, rgba(255, 255, 255, 0.07), transparent 62%),
+    linear-gradient(180deg, rgba(16, 16, 22, 0.2), rgba(8, 8, 12, 0.55));
+}
+
+.task-still-wash {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(14, 14, 19, 0.15),
+      rgba(14, 14, 19, 0.55) 78%,
+      rgba(14, 14, 19, 0.82)
+    ),
+    repeating-linear-gradient(
+      -18deg,
+      transparent,
+      transparent 18px,
+      rgba(255, 255, 255, 0.018) 18px,
+      rgba(255, 255, 255, 0.018) 19px
+    );
+  filter: saturate(0.7) brightness(0.92);
+}
+
+.task-still-icon {
+  position: absolute;
+  right: 28px;
+  top: 28px;
+  height: 72px;
+  width: 72px;
+  fill: none;
+  stroke: color-mix(in srgb, var(--task-accent) 80%, white);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.72;
+}
+
+.task-still-caption {
+  position: absolute;
+  left: 28px;
+  bottom: 22px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(247, 246, 242, 0.72);
+}
+
+.task-rail {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.task-rail li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  text-align: center;
+}
+
+.task-rail-dot {
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.task-rail li[data-state="done"] .task-rail-dot,
+.task-rail li[data-state="current"] .task-rail-dot {
+  background: rgba(239, 232, 220, 0.82);
+}
+
+.task-rail li[data-state="current"] .task-rail-dot {
+  box-shadow: 0 0 12px rgba(239, 232, 220, 0.35);
+}
+
+.task-rail-label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(247, 246, 242, 0.42);
+}
+
+.task-rail li[data-state="done"] .task-rail-label,
+.task-rail li[data-state="current"] .task-rail-label {
+  color: rgba(247, 246, 242, 0.82);
+}
+
+.avatar-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+  background: conic-gradient(
+    from 210deg,
+    rgba(255, 255, 255, 0.5),
+    rgba(255, 255, 255, 0.06),
+    rgba(239, 232, 220, 0.55),
+    rgba(255, 255, 255, 0.12),
+    rgba(255, 255, 255, 0.5)
+  );
+}
+
+.avatar-live {
+  position: absolute;
+  z-index: 2;
+  right: 2px;
+  bottom: 2px;
+  height: 0.7rem;
+  width: 0.7rem;
+  border-radius: 999px;
+  background: var(--positive);
+  box-shadow: 0 0 0 3px #0e0e13;
+}
+
+.ghost-row {
+  opacity: 0.42;
 }
 
 .glass-chip {
@@ -804,6 +997,11 @@ body {
   .glass-tile-hover:hover {
     transform: none;
     transition: none;
+  }
+
+  .pointer-glow,
+  .glass-tile-hover:hover > .pointer-glow {
+    opacity: 0;
   }
 
   .hero-loop-live {

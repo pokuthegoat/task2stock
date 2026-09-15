@@ -40,7 +40,7 @@ export default async function TasksPage({
             align="center"
             eyebrow="Marketplace"
             title="Tasks"
-            description="Choose a task, complete the requirement, and the intended reward is tokenized stock."
+            description="Choose a task, submit proof, and wait for review. Stock is issued only after verification."
           />
         </PageContainer>
       </section>

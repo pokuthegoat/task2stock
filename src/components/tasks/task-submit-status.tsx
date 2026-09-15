@@ -26,9 +26,9 @@ export function TaskSubmitStatus({
 
   return (
     <div>
-      <p className="max-w-lg text-sm leading-6 text-foreground/58">
-        A moderator will review your proof and, if approved, your stock reward
-        will be processed.
+      <p className="max-w-lg text-sm leading-6 text-foreground/68">
+        Proof stays pending until review. If approved, the stock reward is
+        issued after that.
       </p>
 
       <dl className="glass-tile mt-7 space-y-4 p-6 text-sm">

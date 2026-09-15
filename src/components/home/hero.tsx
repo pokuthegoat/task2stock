@@ -21,7 +21,7 @@ export function Hero() {
             <p className="mt-7 max-w-xl text-xl font-medium leading-8 text-foreground/82 sm:text-2xl sm:leading-9">
               Turn what you do into ownership.
             </p>
-            <p className="mt-5 max-w-lg text-base leading-7 text-foreground/65">
+            <p className="mt-5 max-w-lg text-base leading-7 text-foreground/72">
               Complete real-world tasks from companies, brands, and communities.
               The intended reward is tokenized stock.
             </p>

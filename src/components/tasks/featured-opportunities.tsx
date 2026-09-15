@@ -11,7 +11,7 @@ export function FeaturedOpportunities({ tasks }: { tasks: TaskView[] }) {
           align="center"
           eyebrow="Featured"
           title="High-value opportunities."
-          description="Larger rewards from the catalog."
+          description="Larger rewards. Proof stays pending until review."
         />
         <div className="mt-10 grid gap-4 md:grid-cols-2">
           {tasks.map((task) => (

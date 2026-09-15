@@ -15,7 +15,7 @@ export function EmptyState({
       <h2 className="heading mx-auto mt-4 max-w-xl text-3xl text-foreground md:text-4xl">
         {title}
       </h2>
-      <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-foreground/55">
+      <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-foreground/68">
         {description}
       </p>
       {children ? (

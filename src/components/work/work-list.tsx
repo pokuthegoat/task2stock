@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { GlowLink } from "@/components/ui/glow-link";
 import { RewardBadge } from "@/components/ui/reward-badge";
 import { PageContainer } from "@/components/ui/page-container";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -11,16 +11,17 @@ export function WorkList({ items }: { items: WorkItemView[] }) {
         <ul className="grid gap-4">
           {items.map((item) => (
             <li key={item.taskId}>
-              <Link
+              <GlowLink
                 href={item.href}
                 className="glass-tile glass-tile-hover group flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8"
+                contentClassName="relative z-[1] flex w-full flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8"
               >
                 <div className="min-w-0">
                   <p className="label">{item.companyName}</p>
                   <p className="mt-2 text-lg font-semibold tracking-tight text-foreground">
                     {item.title}
                   </p>
-                  <p className="mt-1.5 text-xs font-medium text-foreground/42">
+                  <p className="mt-1.5 text-[11px] font-medium tracking-[0.04em] text-foreground/58">
                     {item.estimate} · {item.difficulty} · {item.timeBucket}
                   </p>
                 </div>
@@ -34,11 +35,11 @@ export function WorkList({ items }: { items: WorkItemView[] }) {
                       />
                     </div>
                   </div>
-                  <span className="text-sm font-medium text-foreground/58 transition-colors group-hover:text-foreground">
+                  <span className="text-sm font-medium text-foreground/70 transition-colors group-hover:text-foreground">
                     {workActionLabel(item.status)}
                   </span>
                 </div>
-              </Link>
+              </GlowLink>
             </li>
           ))}
         </ul>

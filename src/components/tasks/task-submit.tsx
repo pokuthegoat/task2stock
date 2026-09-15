@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { submitProofAction } from "@/app/actions/task-progress";
+import { TaskProgressRail } from "@/components/tasks/task-progress-rail";
 import { TaskSubmitForm } from "@/components/tasks/task-submit-form";
 import { TaskSubmitStatus } from "@/components/tasks/task-submit-status";
 import { PageContainer } from "@/components/ui/page-container";
@@ -130,11 +131,15 @@ export function TaskSubmit({
     <PageContainer className="pb-24 pt-10 md:pb-32 md:pt-14">
       <Link
         href={`/tasks/${task.id}`}
-        className="glass-chip inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground/62 transition hover:text-foreground hover:brightness-110"
+        className="glass-chip inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground/70 transition hover:text-foreground hover:brightness-110"
       >
         <span aria-hidden="true">←</span>
         Back to task
       </Link>
+
+      <div className="mt-6">
+        <TaskProgressRail current={submitted ? 2 : 1} />
+      </div>
 
       <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="glass-panel p-7 md:p-10">
@@ -148,7 +153,7 @@ export function TaskSubmit({
             {formatRewardOffer(task.reward)}
           </p>
 
-          <p className="mt-6 max-w-xl text-lg leading-8 text-foreground/62">
+          <p className="mt-6 max-w-xl text-lg font-normal leading-8 text-foreground/72">
             {submitted
               ? "Your submission has been sent for review."
               : task.requirement}
@@ -217,20 +222,27 @@ export function TaskSubmit({
 
             <dl className="space-y-4 text-sm">
               <div className="flex justify-between gap-4">
-                <dt className="text-foreground/42">Task</dt>
-                <dd className="text-right text-foreground/82">{task.title}</dd>
+                <dt className="text-foreground/55">Task</dt>
+                <dd className="text-right font-medium text-foreground/88">
+                  {task.title}
+                </dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-foreground/42">Status</dt>
-                <dd className="text-right text-foreground/82">
+                <dt className="text-foreground/55">Status</dt>
+                <dd className="text-right font-medium text-foreground/88">
                   {submitted ? "Payout pending" : "Not submitted"}
                 </dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-foreground/42">Reward</dt>
-                <dd className="text-right text-foreground/82">Not issued</dd>
+                <dt className="text-foreground/55">Reward</dt>
+                <dd className="text-right font-medium text-foreground/88">
+                  Not issued
+                </dd>
               </div>
             </dl>
+            <p className="mt-7 text-center text-xs leading-5 text-foreground/55">
+              Proof stays pending until review.
+            </p>
           </div>
         </aside>
       </div>

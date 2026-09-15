@@ -56,8 +56,8 @@ export function HeroLoop() {
               $15 NVDA
             </p>
           </div>
-          <p className="mt-4 text-xs leading-5 text-foreground/42">
-            Catalog example.
+          <p className="mt-4 text-xs leading-5 text-foreground/58">
+            Proof stays pending until review.
           </p>
         </div>
       </div>

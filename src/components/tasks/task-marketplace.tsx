@@ -22,8 +22,8 @@ import {
 import { TaskCard } from "@/components/tasks/task-card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { FilterChipGroup } from "@/components/ui/filter-chips";
 import { PageContainer } from "@/components/ui/page-container";
-import { Select } from "@/components/ui/select";
 
 const sortLabels: Record<MarketplaceSort, string> = {
   newest: "Newest",
@@ -107,55 +107,48 @@ export function TaskMarketplace({
 
           <hr className="hairline my-6" />
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Select
-              id="category"
+          <div className="grid gap-5 lg:grid-cols-2">
+            <FilterChipGroup
               label="Category"
               value={query.category}
               onChange={(value) =>
                 patch({ category: value as "All" | TaskCategory })
               }
-            >
-              <option value="All">All categories</option>
-              {taskCategories.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </Select>
+              options={[
+                { value: "All", label: "All" },
+                ...taskCategories.map((item) => ({
+                  value: item,
+                  label: item,
+                })),
+              ]}
+            />
 
-            <Select
-              id="ticker"
+            <FilterChipGroup
               label="Reward stock"
               value={query.ticker}
               onChange={(value) => patch({ ticker: value })}
-            >
-              <option value="All">All stocks</option>
-              {tickers.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </Select>
+              options={[
+                { value: "All", label: "All" },
+                ...tickers.map((item) => ({ value: item, label: item })),
+              ]}
+            />
 
-            <Select
-              id="reward"
+            <FilterChipGroup
               label="Reward amount"
               value={query.reward?.id ?? "All"}
               onChange={(value) =>
                 patch({ reward: parseRewardRangeId(value) })
               }
-            >
-              <option value="All">Any amount</option>
-              {rewardOptions.map((range) => (
-                <option key={range.id} value={range.id}>
-                  {range.label}
-                </option>
-              ))}
-            </Select>
+              options={[
+                { value: "All", label: "Any" },
+                ...rewardOptions.map((range) => ({
+                  value: range.id,
+                  label: range.label,
+                })),
+              ]}
+            />
 
-            <Select
-              id="time"
+            <FilterChipGroup
               label="Estimated time"
               value={query.timeBucket}
               onChange={(value) =>
@@ -163,17 +156,16 @@ export function TaskMarketplace({
                   timeBucket: value as "All" | TaskTimeBucket,
                 })
               }
-            >
-              <option value="All">Any time</option>
-              {taskTimeBuckets.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </Select>
+              options={[
+                { value: "All", label: "Any" },
+                ...taskTimeBuckets.map((item) => ({
+                  value: item,
+                  label: item,
+                })),
+              ]}
+            />
 
-            <Select
-              id="difficulty"
+            <FilterChipGroup
               label="Difficulty"
               value={query.difficulty}
               onChange={(value) =>
@@ -181,41 +173,36 @@ export function TaskMarketplace({
                   difficulty: value as "All" | TaskDifficulty,
                 })
               }
-            >
-              <option value="All">All levels</option>
-              {taskDifficulties.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </Select>
+              options={[
+                { value: "All", label: "All" },
+                ...taskDifficulties.map((item) => ({
+                  value: item,
+                  label: item,
+                })),
+              ]}
+            />
 
-            <Select
-              id="sort"
+            <FilterChipGroup
               label="Sort"
               value={query.sort}
-              onChange={(value) =>
-                patch({ sort: value as MarketplaceSort })
-              }
-            >
-              {marketplaceSorts.map((item) => (
-                <option key={item} value={item}>
-                  {sortLabels[item]}
-                </option>
-              ))}
-            </Select>
+              onChange={(value) => patch({ sort: value as MarketplaceSort })}
+              options={marketplaceSorts.map((item) => ({
+                value: item,
+                label: sortLabels[item],
+              }))}
+            />
           </div>
         </div>
 
         <div className="mt-8 flex items-center justify-between gap-4 px-1">
-          <p className="text-sm font-medium text-foreground/48">
+          <p className="text-sm font-medium text-foreground/58">
             {results.length} {results.length === 1 ? "task" : "tasks"}
           </p>
           {marketplaceQueryIsActive(query) ? (
             <button
               type="button"
               onClick={clearFilters}
-              className="text-sm font-medium text-foreground/62 transition-colors hover:text-foreground"
+              className="text-sm font-medium text-foreground/70 transition-colors hover:text-foreground"
             >
               Clear filters
             </button>

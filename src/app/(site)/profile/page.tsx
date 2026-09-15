@@ -56,7 +56,7 @@ export default async function ProfilePage() {
                   <h2 className="heading text-3xl text-foreground">
                     {profile.displayName}
                   </h2>
-                  <p className="mt-2 text-sm text-foreground/58">
+                  <p className="mt-2 text-sm text-foreground/70">
                     @{profile.username}
                   </p>
                 </div>

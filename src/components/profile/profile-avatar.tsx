@@ -96,15 +96,17 @@ export function ProfileAvatar({
           void onFile(file);
         }}
       />
-      <button
-        type="button"
-        disabled={pending || !user?.id}
-        aria-label="Change profile picture"
-        className={`group relative ${box} overflow-hidden rounded-full ring-1 ring-white/12 ${
-          pending ? "cursor-wait" : "cursor-pointer"
-        }`}
-        onClick={() => inputRef.current?.click()}
-      >
+      <div className="relative inline-flex">
+        <span className="avatar-ring" aria-hidden="true" />
+        <button
+          type="button"
+          disabled={pending || !user?.id}
+          aria-label="Change profile picture"
+          className={`group relative z-[1] ${box} overflow-hidden rounded-full ring-2 ring-[#0e0e13] ${
+            pending ? "cursor-wait" : "cursor-pointer"
+          }`}
+          onClick={() => inputRef.current?.click()}
+        >
         {showImage ? (
           // Public Blob URL. next/image is not configured for arbitrary hosts.
           // eslint-disable-next-line @next/next/no-img-element
@@ -148,6 +150,9 @@ export function ProfileAvatar({
           )}
         </span>
       </button>
+      <span className="avatar-live z-[2]" title="Signed in" aria-hidden="true" />
+      <span className="sr-only">Signed in</span>
+      </div>
       {message ? (
         <div className="mt-4 max-w-sm">
           <FormMessage message={message} />

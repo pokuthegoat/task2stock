@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { GlowLink } from "@/components/ui/glow-link";
 import { RewardBadge } from "@/components/ui/reward-badge";
 import { PageContainer } from "@/components/ui/page-container";
 import { Reveal } from "@/components/ui/reveal";
@@ -14,16 +14,17 @@ export function RewardPreview({ items }: { items: HomeRewardPreview[] }) {
             align="center"
             eyebrow="Rewards"
             title="Work, and earn stocks."
-            description="These amounts and tickers are the catalog RewardOffer on each task."
+            description="Amounts and tickers from each task. Proof stays pending until review."
           />
         </Reveal>
         <Reveal className="mt-14">
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (
               <li key={item.taskId} className="reward-row">
-                <Link
+                <GlowLink
                   href={`/tasks/${item.taskId}`}
                   className="glass-tile glass-tile-hover flex h-full flex-col items-center p-7 text-center"
+                  contentClassName="relative z-[1] flex h-full flex-col items-center"
                 >
                   <p className="label">{item.companyName}</p>
                   <p className="mt-3 flex-1 text-lg font-semibold leading-7 tracking-tight text-foreground">
@@ -33,7 +34,7 @@ export function RewardPreview({ items }: { items: HomeRewardPreview[] }) {
                   <span className="text-xl">
                     <RewardBadge offer={item.offer} example={false} motion />
                   </span>
-                </Link>
+                </GlowLink>
               </li>
             ))}
           </ul>

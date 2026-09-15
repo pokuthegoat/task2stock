@@ -12,8 +12,8 @@ export function FeaturedTasks({ tasks }: { tasks: TaskView[] }) {
           <SectionHeading
             align="center"
             eyebrow="Featured tasks"
-            title="A few tasks from the catalog."
-            description="These are existing listings. Each card opens the task detail page."
+            title="A few tasks you can start today."
+            description="Each card opens the task. Proof stays pending until review."
           />
         </Reveal>
         <Reveal className="mt-14">
