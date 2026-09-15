@@ -45,43 +45,44 @@ export default async function ProfilePage() {
       <section className="pb-28">
         <PageContainer className="grid max-w-2xl gap-16">
           <div className="border-t border-white/8 pt-8">
-            <ProfileAvatar
-              name={profile.displayName}
-              username={profile.username}
-              avatarUrl={profile.avatarUrl}
-            />
-            <h2 className="heading mt-6 text-3xl text-foreground">
-              {profile.displayName}
-            </h2>
-            <p className="mt-2 text-sm text-foreground/58">@{profile.username}</p>
-          </div>
-
-          <div className="border-t border-white/8 pt-8">
-            <p className="label">Profile information</p>
-            <h2 className="heading mt-3 text-3xl text-foreground">
-              Edit profile
-            </h2>
-            <div className="mt-8 space-y-12">
-              <ProfileTextForm
-                key={`username-${profile.username}`}
-                action={updateUsernameAction}
-                field="username"
-                label="Username"
-                autoComplete="username"
-                initialValue={profile.username}
-                cooldown={profile.usernameCooldown}
-                submitLabel="Change username"
-                hint="3–20 characters. Letters, numbers, and underscores."
-              />
-              <ProfileTextForm
-                key={`name-${profile.displayName}`}
-                action={updateDisplayNameAction}
-                field="displayName"
-                label="Display name"
-                autoComplete="nickname"
-                initialValue={profile.displayName}
-                submitLabel="Save display name"
-              />
+            <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:gap-10">
+              <div className="shrink-0">
+                <ProfileAvatar
+                  name={profile.displayName}
+                  username={profile.username}
+                  avatarUrl={profile.avatarUrl}
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h2 className="heading text-3xl text-foreground">
+                  {profile.displayName}
+                </h2>
+                <p className="mt-2 text-sm text-foreground/58">
+                  @{profile.username}
+                </p>
+                <div className="mt-8 space-y-12">
+                  <ProfileTextForm
+                    key={`username-${profile.username}`}
+                    action={updateUsernameAction}
+                    field="username"
+                    label="Username"
+                    autoComplete="username"
+                    initialValue={profile.username}
+                    cooldown={profile.usernameCooldown}
+                    submitLabel="Change username"
+                    hint="3–20 characters. Letters, numbers, and underscores."
+                  />
+                  <ProfileTextForm
+                    key={`name-${profile.displayName}`}
+                    action={updateDisplayNameAction}
+                    field="displayName"
+                    label="Display name"
+                    autoComplete="nickname"
+                    initialValue={profile.displayName}
+                    submitLabel="Save display name"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
