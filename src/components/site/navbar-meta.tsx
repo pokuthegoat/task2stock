@@ -1,78 +1,14 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-
 const pill =
   "glass-chip inline-flex h-9 items-center justify-center text-[12px] font-medium text-foreground/78 transition hover:brightness-110 hover:text-foreground";
 
 export function NavbarCaButton() {
-  const [copied, setCopied] = useState(false);
-  const timer = useRef<number>(0);
-
-  useEffect(() => {
-    return () => window.clearTimeout(timer.current);
-  }, []);
-
-  async function copy() {
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(
-          "FfG6GPNM6K5N6HQ2R9U1YAqzedYVGN1fRz38Uvq463MG",
-        );
-      } else {
-        throw new Error("clipboard");
-      }
-    } catch {
-      const field = document.createElement("textarea");
-      field.value = "FfG6GPNM6K5N6HQ2R9U1YAqzedYVGN1fRz38Uvq463MG";
-      field.setAttribute("readonly", "");
-      field.style.position = "fixed";
-      field.style.left = "-9999px";
-      document.body.appendChild(field);
-      field.select();
-      document.execCommand("copy");
-      document.body.removeChild(field);
-    }
-
-    setCopied(true);
-    window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setCopied(false), 1600);
-  }
-
   return (
-    <button
-      type="button"
-      onClick={() => void copy()}
-      aria-label={
-        copied
-          ? "Contract address copied"
-          : "Copy contract address FfG6GPNM6K5N6HQ2R9U1YAqzedYVGN1fRz38Uvq463MG"
-      }
-      className={`group ${pill} overflow-hidden px-3 transition-[max-width] duration-300 ease-out motion-reduce:transition-none ${
-        copied
-          ? "max-w-[6.5rem]"
-          : "max-w-[9.75rem] hover:max-w-[32rem]"
-      }`}
+    <span
+      aria-label="Contract address not applicable"
+      className={`${pill} px-3`}
     >
-      {copied ? (
-        <span className="px-0.5">Copied</span>
-      ) : (
-        <span className="flex items-center gap-1.5 whitespace-nowrap">
-          <span className="text-[10px] font-medium tracking-[0.14em] text-foreground/48">
-            CA
-          </span>
-          <span className="font-mono text-[12px] tracking-tight">
-            <span className="group-hover:hidden">FfG6...</span>
-            <span className="hidden group-hover:inline">
-              FfG6GPNM6K5N6HQ2R9U1YAqzedYVGN1fRz38Uvq463MG
-            </span>
-          </span>
-          <span className="text-[10px] font-medium tracking-[0.12em] text-foreground/42 group-hover:hidden">
-            COPY
-          </span>
-        </span>
-      )}
-    </button>
+      ca not applicable
+    </span>
   );
 }
 
