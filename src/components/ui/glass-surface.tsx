@@ -16,7 +16,7 @@ export function GlassSurface({
     <Tag
       className={`glass rounded-[22px] ${
         hover
-          ? "transition duration-300 hover:scale-[1.008] hover:border-white/16"
+          ? "transition duration-300 hover:scale-[1.008] hover:border-white/24 hover:brightness-[1.04]"
           : ""
       } ${className}`}
       {...rest}
