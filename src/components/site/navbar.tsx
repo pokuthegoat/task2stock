@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Logo } from "@/components/site/logo";
+import { NavbarMetaButtons } from "@/components/site/navbar-meta";
 import { Button } from "@/components/ui/button";
 import { PageContainer } from "@/components/ui/page-container";
 
@@ -62,6 +63,7 @@ export function Navbar() {
           </nav>
 
           <div className="hidden items-center justify-end gap-2 md:flex">
+            <NavbarMetaButtons />
             {user ? (
               <Button
                 variant="secondary"
@@ -131,7 +133,8 @@ export function Navbar() {
               )}
             </nav>
             <hr className="hairline my-4" />
-            <div className="grid gap-3">
+            <NavbarMetaButtons />
+            <div className="mt-3 grid gap-3">
               {user ? (
                 <Button
                   variant="secondary"
