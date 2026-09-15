@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export const BRAND_MARK_SRC = "/brand/t__xvgGX_400x400.jpg";
+export const BRAND_MARK_SRC = "/brand/t__xvgGX_400x400.png";
 
 export function BrandMark({
   size = 28,
