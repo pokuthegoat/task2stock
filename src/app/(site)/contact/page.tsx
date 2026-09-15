@@ -14,19 +14,21 @@ export default function ContactPage() {
 
   return (
     <main id="main" className="section-base flex-1">
-      <section className="pt-16 pb-24 md:pt-24 md:pb-32">
+      <section className="pb-24 pt-10 md:pb-32 md:pt-16">
         <PageContainer>
-          <SectionHeading
-            as="h1"
-            eyebrow="Contact"
-            title="Get in touch"
-            description="Send a note about Task2Stock. This opens your email client with the message filled in."
-          />
-          <div className="mt-12 max-w-[440px]">
+          <div className="glass-panel mx-auto w-full max-w-[520px] px-6 py-10 md:px-10 md:py-12">
+            <SectionHeading
+              as="h1"
+              align="center"
+              eyebrow="Contact"
+              title="Get in touch"
+              description="Send a note about Task2Stock. This opens your email client with the message filled in."
+            />
+            <hr className="hairline my-8" />
             {recipient ? (
               <ContactForm recipient={recipient} />
             ) : (
-              <p className="text-sm leading-6 text-foreground/58">
+              <p className="text-center text-sm leading-6 text-foreground/58">
                 Contact email is not configured yet.
               </p>
             )}

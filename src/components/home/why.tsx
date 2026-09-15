@@ -24,29 +24,32 @@ export function Why() {
       <PageContainer>
         <Reveal>
           <SectionHeading
+            align="center"
             eyebrow="Why Task2Stock"
             title="Work that is meant to become ownership."
             description="The idea is simple. Do the task. Earn a stock-oriented reward."
           />
         </Reveal>
-        <Reveal className="mt-12">
-          <FlowVisual />
+
+        <Reveal className="mt-14">
+          <div className="glass-panel px-6 py-10 md:px-12 md:py-12">
+            <FlowVisual />
+            <hr className="hairline my-10" />
+            <ol className="grid gap-8 md:grid-cols-3 md:gap-10">
+              {points.map((point, index) => (
+                <li key={point.title} className="text-center md:text-left">
+                  <p className="label">{String(index + 1).padStart(2, "0")}</p>
+                  <h3 className="heading mt-4 text-2xl text-foreground">
+                    {point.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-6 text-foreground/58">
+                    {point.copy}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </div>
         </Reveal>
-        <ol className="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
-          {points.map((point, index) => (
-            <li key={point.title}>
-              <Reveal delay={index * 90}>
-                <p className="label">{String(index + 1).padStart(2, "0")}</p>
-                <h3 className="heading mt-4 text-2xl text-foreground">
-                  {point.title}
-                </h3>
-                <p className="mt-3 text-sm leading-6 text-foreground/55">
-                  {point.copy}
-                </p>
-              </Reveal>
-            </li>
-          ))}
-        </ol>
       </PageContainer>
     </section>
   );

@@ -1,10 +1,10 @@
 import type { WorkStatus } from "@/lib/data";
 
 const tones: Record<WorkStatus, string> = {
-  in_progress: "border-white/12 text-foreground/70",
-  proof_submitted: "border-white/12 text-foreground/80",
-  verified: "border-positive/30 text-positive",
-  reward_issued: "border-accent/25 text-accent",
+  in_progress: "border-white/14 text-foreground/72",
+  proof_submitted: "border-white/16 text-foreground/85",
+  verified: "border-positive/35 text-positive",
+  reward_issued: "border-accent/30 text-accent",
 };
 
 export function StatusBadge({
@@ -16,7 +16,7 @@ export function StatusBadge({
 }) {
   return (
     <span
-      className={`inline-flex rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${tones[status]}`}
+      className={`glass-chip inline-flex px-3 py-1 text-[11px] font-medium ${tones[status]}`}
     >
       {label}
     </span>

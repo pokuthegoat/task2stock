@@ -25,43 +25,46 @@ export function TaskSubmitStatus({
     : null;
 
   return (
-    <div className="pt-2">
+    <div>
       <p className="max-w-lg text-sm leading-6 text-foreground/58">
         A moderator will review your proof and, if approved, your stock reward
         will be processed.
       </p>
-      <dl className="mt-8 space-y-4 border-t border-white/8 pt-5 text-sm">
+
+      <dl className="glass-tile mt-7 space-y-4 p-6 text-sm">
         <div className="flex justify-between gap-4">
-          <dt className="text-foreground/40">Task</dt>
-          <dd className="text-right text-foreground/80">{taskTitle}</dd>
+          <dt className="text-foreground/42">Task</dt>
+          <dd className="text-right text-foreground/82">{taskTitle}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt className="text-foreground/40">Reward</dt>
-          <dd className="text-right font-mono text-foreground/80">
+          <dt className="text-foreground/42">Reward</dt>
+          <dd className="text-right font-mono text-foreground/82">
             {formatRewardOffer(reward)}
           </dd>
         </div>
         {submittedLabel ? (
           <div className="flex justify-between gap-4">
-            <dt className="text-foreground/40">Submitted</dt>
-            <dd className="text-right text-foreground/80">{submittedLabel}</dd>
+            <dt className="text-foreground/42">Submitted</dt>
+            <dd className="text-right text-foreground/82">{submittedLabel}</dd>
           </div>
         ) : null}
         <div className="flex justify-between gap-4">
-          <dt className="text-foreground/40">Status</dt>
-          <dd className="text-right text-foreground/80">Payout pending</dd>
+          <dt className="text-foreground/42">Status</dt>
+          <dd className="text-right text-foreground/82">Payout pending</dd>
         </div>
       </dl>
+
       {details ? (
-        <div className="mt-6 border-t border-white/8 pt-5">
+        <div className="glass-tile mt-3 p-6">
           <p className="label">What you did</p>
-          <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-foreground/70">
+          <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-foreground/72">
             {details}
           </p>
         </div>
       ) : null}
+
       {file ? (
-        <div className="mt-6 border-t border-white/8 pt-5">
+        <div className="glass-tile mt-3 p-6">
           <p className="label">Image proof</p>
           <a
             href={file.href}
@@ -69,7 +72,7 @@ export function TaskSubmitStatus({
           >
             {file.fileName}
           </a>
-          <p className="mt-1 text-xs text-foreground/40">
+          <p className="mt-1 text-xs text-foreground/42">
             {file.size < 1024
               ? `${file.size} B`
               : file.size < 1024 * 1024
@@ -78,8 +81,9 @@ export function TaskSubmitStatus({
           </p>
         </div>
       ) : null}
+
       {videoUrl ? (
-        <div className="mt-6 border-t border-white/8 pt-5">
+        <div className="glass-tile mt-3 p-6">
           <p className="label">Video proof</p>
           <a
             href={videoUrl}
@@ -91,12 +95,15 @@ export function TaskSubmitStatus({
           </a>
         </div>
       ) : null}
-      <p className="mt-8 max-w-lg text-xs leading-5 text-foreground/38">
+
+      <p className="mt-7 max-w-lg text-xs leading-5 text-foreground/40">
         {formatUsdCompact(reward.amountCents)} {reward.ticker} is not issued
         yet. Portfolio is unchanged.
       </p>
       <div className="mt-8">
-        <Button href="/work">Back to my work</Button>
+        <Button href="/work" size="lg">
+          Back to my work
+        </Button>
       </div>
     </div>
   );

@@ -37,82 +37,82 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 glass-nav">
-      <PageContainer className="flex h-16 items-center justify-between md:h-[72px]">
-        <Logo />
+    <header className="sticky top-0 z-50 py-3 md:py-4">
+      <PageContainer>
+        <div className="glass-nav grid h-14 grid-cols-[1fr_auto] items-center gap-3 rounded-full pl-4 pr-2 md:grid-cols-[1fr_auto_1fr] md:px-3">
+          <Logo />
 
-        <nav className="hidden items-center gap-7 md:flex">
-          {links.map((link) =>
-            link.href.startsWith("/#") ? (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-sm font-medium text-foreground/58 transition-colors duration-300 hover:text-foreground"
+          <nav className="hidden items-center justify-center gap-1 md:flex">
+            {links.map((link) =>
+              link.href.startsWith("/#") ? (
+                <a key={link.href} href={link.href} className="nav-link">
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="nav-link"
+                  data-active={isActive(link.href)}
+                >
+                  {link.label}
+                </Link>
+              ),
+            )}
+          </nav>
+
+          <div className="hidden items-center justify-end gap-2 md:flex">
+            {user ? (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => signOut()}
               >
-                {link.label}
-              </a>
+                Sign out
+              </Button>
             ) : (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`text-sm font-medium transition-colors duration-300 ${
-                  isActive(link.href)
-                    ? "text-foreground"
-                    : "text-foreground/58 hover:text-foreground"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ),
-          )}
-        </nav>
+              <>
+                <Button href="/login" variant="ghost" size="sm">
+                  Sign in
+                </Button>
+                <Button href="/tasks" size="sm">
+                  Start earning
+                </Button>
+              </>
+            )}
+          </div>
 
-        <div className="hidden items-center gap-2 md:flex">
-          {user ? (
-            <Button variant="ghost" className="h-10 px-3" onClick={() => signOut()}>
-              Sign out
-            </Button>
-          ) : (
-            <>
-              <Button href="/login" variant="ghost" className="h-10 px-3">
-                Sign in
-              </Button>
-              <Button href="/tasks" className="h-10">
-                Start earning
-              </Button>
-            </>
-          )}
+          <button
+            type="button"
+            className="glass-chip flex h-10 w-10 items-center justify-center text-foreground transition hover:brightness-110 md:hidden"
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            onClick={() => setOpen((value) => !value)}
+          >
+            <span className="sr-only">{open ? "Close menu" : "Menu"}</span>
+            <span className="flex flex-col items-center justify-center gap-1.5">
+              <span
+                className={`block h-px w-4 bg-foreground transition ${open ? "translate-y-[3.5px] rotate-45" : ""}`}
+              />
+              <span
+                className={`block h-px w-4 bg-foreground transition ${open ? "-translate-y-[3.5px] -rotate-45" : ""}`}
+              />
+            </span>
+          </button>
         </div>
 
-        <button
-          type="button"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-foreground md:hidden"
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          onClick={() => setOpen((value) => !value)}
-        >
-          <span className="sr-only">{open ? "Close menu" : "Menu"}</span>
-          <span className="flex flex-col items-center justify-center gap-1.5">
-            <span
-              className={`block h-px w-4 bg-foreground transition ${open ? "translate-y-[3.5px] rotate-45" : ""}`}
-            />
-            <span
-              className={`block h-px w-4 bg-foreground transition ${open ? "-translate-y-[3.5px] -rotate-45" : ""}`}
-            />
-          </span>
-        </button>
-      </PageContainer>
-
-      {open ? (
-        <div id="mobile-nav" className="border-t border-white/8 py-5 md:hidden">
-          <PageContainer>
-            <nav className="flex flex-col gap-4">
+        {open ? (
+          <div
+            id="mobile-nav"
+            className="glass-panel mt-3 p-5 md:hidden"
+          >
+            <nav className="grid gap-1">
               {links.map((link) =>
                 link.href.startsWith("/#") ? (
                   <a
                     key={link.href}
                     href={link.href}
-                    className="text-[15px] font-medium text-foreground/80"
+                    className="nav-link text-[15px]"
                     onClick={() => setOpen(false)}
                   >
                     {link.label}
@@ -121,7 +121,8 @@ export function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="text-[15px] font-medium text-foreground/80"
+                    className="nav-link text-[15px]"
+                    data-active={isActive(link.href)}
                     onClick={() => setOpen(false)}
                   >
                     {link.label}
@@ -129,7 +130,8 @@ export function Navbar() {
                 ),
               )}
             </nav>
-            <div className="mt-5 flex flex-col gap-3">
+            <hr className="hairline my-4" />
+            <div className="grid gap-3">
               {user ? (
                 <Button
                   variant="secondary"
@@ -142,7 +144,11 @@ export function Navbar() {
                 </Button>
               ) : (
                 <>
-                  <Button href="/login" variant="secondary" onClick={() => setOpen(false)}>
+                  <Button
+                    href="/login"
+                    variant="secondary"
+                    onClick={() => setOpen(false)}
+                  >
                     Sign in
                   </Button>
                   <Button href="/tasks" onClick={() => setOpen(false)}>
@@ -151,9 +157,9 @@ export function Navbar() {
                 </>
               )}
             </div>
-          </PageContainer>
-        </div>
-      ) : null}
+          </div>
+        ) : null}
+      </PageContainer>
     </header>
   );
 }

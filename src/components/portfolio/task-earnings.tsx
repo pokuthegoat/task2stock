@@ -15,26 +15,26 @@ function EarningsList({
   keyPrefix: string;
 }) {
   return (
-    <ul className="mt-8 divide-y divide-white/8 border-y border-white/8">
+    <ul className="mt-8 grid gap-3">
       {items.map((item) => (
         <li key={`${keyPrefix}-${item.reward.id}`}>
           <Link
             href={`/tasks/${item.reward.taskId}`}
-            className="flex flex-col gap-3 py-5 transition-colors hover:bg-white/[0.02] sm:flex-row sm:items-center sm:justify-between"
+            className="glass-tile glass-tile-hover flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between"
           >
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-semibold text-foreground">
                 {item.taskTitle}
               </p>
-              <p className="mt-1 text-xs font-medium text-foreground/40">
+              <p className="mt-1.5 text-xs font-medium text-foreground/42">
                 {item.companyName} · {item.completedLabel}
               </p>
             </div>
-            <div className="flex items-center justify-between gap-6 sm:justify-end">
+            <div className="flex shrink-0 items-center justify-between gap-6 sm:justify-end">
               <p className="text-sm font-medium text-accent">
                 {formatUsdCompact(item.reward.amountCents)} {item.reward.ticker}
               </p>
-              <p className="text-xs font-medium text-foreground/40">
+              <p className="text-xs font-medium text-foreground/42">
                 {item.statusLabel}
               </p>
             </div>
@@ -72,10 +72,7 @@ export function TaskEarnings({
         ) : null}
 
         <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end">
-          <SectionHeading
-            eyebrow="Task earnings"
-            title="Completed tasks"
-          />
+          <SectionHeading eyebrow="Task earnings" title="Completed tasks" />
           <p className="max-w-sm text-sm leading-6 text-foreground/48">
             Each row is a recorded reward, not a settled stock transfer.
           </p>

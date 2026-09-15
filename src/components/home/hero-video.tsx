@@ -126,7 +126,7 @@ export function HeroVideo() {
     <div
       ref={layerRef}
       aria-hidden="true"
-      className="hero-video-layer pointer-events-none absolute inset-x-0 -top-16 bottom-0 z-0 overflow-hidden md:-top-[72px]"
+      className="hero-video-layer pointer-events-none absolute inset-x-0 bottom-0 z-0 overflow-hidden"
     >
       {failed ? null : (
         <video

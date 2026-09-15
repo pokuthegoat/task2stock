@@ -70,7 +70,7 @@ export function SignupForm({ notice = null }: { notice?: string | null }) {
           onChange={setConfirmPassword}
           error={state.errors.confirmPassword}
         />
-        <Button type="submit" disabled={pending} className="w-full">
+        <Button type="submit" size="lg" disabled={pending} className="w-full">
           Create account
         </Button>
       </form>

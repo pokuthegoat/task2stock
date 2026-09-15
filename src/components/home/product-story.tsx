@@ -117,6 +117,7 @@ export function ProductStory() {
       <PageContainer>
         <Reveal>
           <SectionHeading
+            align="center"
             eyebrow="How it works"
             title="Action becomes a stock reward."
             description="The same product interface, from choosing a task to owning the reward."
@@ -125,7 +126,7 @@ export function ProductStory() {
 
         <div className="mt-14 grid gap-10 lg:grid-cols-2 lg:items-stretch lg:gap-16">
           <div className="hidden lg:block">
-            <div className="sticky top-24">
+            <div className="sticky top-28">
               <LoopVisual stage={stage} />
             </div>
           </div>
@@ -144,7 +145,7 @@ export function ProductStory() {
                 }`}
               >
                 <div
-                  className={`relative max-w-md lg:sticky lg:top-24 lg:py-2 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+                  className={`relative max-w-md lg:sticky lg:top-28 lg:py-2 transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
                     active === index
                       ? "z-[1] opacity-100"
                       : "opacity-[0.46] lg:translate-y-1"

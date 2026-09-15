@@ -24,10 +24,11 @@ export default async function WorkPage() {
 
   return (
     <main id="main" className="section-base flex-1">
-      <section className="pt-16 pb-10 md:pt-24 md:pb-12">
+      <section className="pb-12 pt-10 md:pb-14 md:pt-16">
         <PageContainer>
           <SectionHeading
             as="h1"
+            align="center"
             eyebrow="Work"
             title="My Work"
             description="Every task you have started, with its current status."

@@ -93,7 +93,7 @@ export function TaskMarketplace({
   return (
     <section className="pb-24 pt-8 md:pb-32">
       <PageContainer>
-        <div className="border-y border-white/8 py-6">
+        <div className="glass-panel p-6 md:p-8">
           <label className="block">
             <span className="label">Search</span>
             <input
@@ -105,7 +105,9 @@ export function TaskMarketplace({
             />
           </label>
 
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <hr className="hairline my-6" />
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Select
               id="category"
               label="Category"
@@ -205,7 +207,7 @@ export function TaskMarketplace({
           </div>
         </div>
 
-        <div className="mt-8 flex items-end justify-between gap-4">
+        <div className="mt-8 flex items-center justify-between gap-4 px-1">
           <p className="text-sm font-medium text-foreground/48">
             {results.length} {results.length === 1 ? "task" : "tasks"}
           </p>
@@ -221,7 +223,7 @@ export function TaskMarketplace({
         </div>
 
         {results.length > 0 ? (
-          <div className="mt-6 grid gap-px overflow-hidden rounded-[22px] border border-white/8 bg-white/8 md:grid-cols-2">
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
             {results.map((task) => (
               <TaskCard key={task.id} task={task} />
             ))}

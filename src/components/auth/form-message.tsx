@@ -9,11 +9,14 @@ export function FormMessage({
 
   const classes =
     tone === "success"
-      ? "rounded-full border border-accent/30 bg-accent/8 px-4 py-3 text-xs leading-5 text-accent"
-      : "rounded-full border border-[#c9a9a2]/30 bg-[#c9a9a2]/8 px-4 py-3 text-xs leading-5 text-[#d4b4ae]";
+      ? "border-accent/30 bg-accent/10 text-accent"
+      : "border-[#c9a9a2]/30 bg-[#c9a9a2]/10 text-[#d4b4ae]";
 
   return (
-    <p role="alert" className={classes}>
+    <p
+      role="alert"
+      className={`rounded-2xl border px-4 py-3 text-xs leading-5 backdrop-blur-md ${classes}`}
+    >
       {message}
     </p>
   );

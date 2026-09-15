@@ -10,7 +10,7 @@ export function Stat({
   accent?: boolean;
 }) {
   return (
-    <div>
+    <div className="glass-tile p-5">
       <p className="label">{label}</p>
       <p
         className={`stat-value mt-3 text-3xl ${
@@ -19,7 +19,7 @@ export function Stat({
       >
         {value}
       </p>
-      {note ? <p className="mt-2 text-xs text-foreground/40">{note}</p> : null}
+      {note ? <p className="mt-2 text-xs text-foreground/42">{note}</p> : null}
     </div>
   );
 }

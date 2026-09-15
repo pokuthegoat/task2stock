@@ -9,29 +9,29 @@ export function HoldingsList() {
     <section className="pt-14">
       <PageContainer>
         <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end">
-          <SectionHeading
-            eyebrow="Holdings"
-            title="Positions"
-          />
+          <SectionHeading eyebrow="Holdings" title="Positions" />
           <p className="max-w-sm text-sm leading-6 text-foreground/48">
             Tokenized stock from completed tasks. Not real balances.
           </p>
         </div>
 
-        <div className="mt-8 hidden overflow-hidden rounded-[22px] border border-white/8 md:block">
+        <div className="glass-panel mt-8 hidden overflow-hidden md:block">
           <table className="w-full text-left text-sm">
-            <thead className="bg-white/[0.03] text-xs font-medium uppercase tracking-[0.14em] text-foreground/40">
+            <thead className="text-xs font-medium uppercase tracking-[0.14em] text-foreground/40">
               <tr>
-                <th className="px-6 py-4 font-medium">Company</th>
-                <th className="px-6 py-4 font-medium">Ticker</th>
-                <th className="px-6 py-4 font-medium">Value</th>
-                <th className="px-6 py-4 font-medium">Source task</th>
-                <th className="px-6 py-4 font-medium">Status</th>
+                <th className="px-6 py-5 font-medium">Company</th>
+                <th className="px-6 py-5 font-medium">Ticker</th>
+                <th className="px-6 py-5 font-medium">Value</th>
+                <th className="px-6 py-5 font-medium">Source task</th>
+                <th className="px-6 py-5 font-medium">Status</th>
               </tr>
             </thead>
             <tbody>
               {holdings.map((holding) => (
-                <tr key={holding.ticker} className="border-t border-white/8">
+                <tr
+                  key={holding.ticker}
+                  className="border-t border-white/8 transition-colors hover:bg-white/[0.035]"
+                >
                   <td className="px-6 py-5 font-medium text-foreground">
                     {holding.name}
                   </td>
@@ -53,9 +53,9 @@ export function HoldingsList() {
           </table>
         </div>
 
-        <div className="mt-8 divide-y divide-white/8 border-y border-white/8 md:hidden">
+        <div className="mt-8 grid gap-4 md:hidden">
           {holdings.map((holding) => (
-            <article key={holding.ticker} className="py-5">
+            <article key={holding.ticker} className="glass-tile p-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="label">{holding.name}</p>

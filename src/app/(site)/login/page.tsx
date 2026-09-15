@@ -26,7 +26,7 @@ export default async function LoginPage({
 
   return (
     <main id="main" className="section-base flex-1">
-      <section className="pb-20 pt-16 md:pb-28 md:pt-24">
+      <section className="pb-20 pt-10 md:pb-28 md:pt-16">
         <AuthShell
           eyebrow="Welcome"
           title="Welcome back"

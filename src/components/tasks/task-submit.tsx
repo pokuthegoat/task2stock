@@ -127,16 +127,17 @@ export function TaskSubmit({
   }
 
   return (
-    <PageContainer className="pb-24 pt-16 md:pb-32 md:pt-20">
+    <PageContainer className="pb-24 pt-10 md:pb-32 md:pt-14">
       <Link
         href={`/tasks/${task.id}`}
-        className="text-sm text-foreground/55 transition-colors hover:text-foreground"
+        className="glass-chip inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground/62 transition hover:text-foreground hover:brightness-110"
       >
+        <span aria-hidden="true">←</span>
         Back to task
       </Link>
 
-      <div className="mt-10 grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-16">
-        <div>
+      <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="glass-panel p-7 md:p-10">
           <p className="label">{task.company.name}</p>
 
           <h1 className="display mt-4 text-4xl text-foreground md:text-5xl">
@@ -147,14 +148,16 @@ export function TaskSubmit({
             {formatRewardOffer(task.reward)}
           </p>
 
-          <p className="mt-6 max-w-xl text-lg leading-8 text-foreground/58">
+          <p className="mt-6 max-w-xl text-lg leading-8 text-foreground/62">
             {submitted
               ? "Your submission has been sent for review."
               : task.requirement}
           </p>
 
+          <hr className="hairline my-9" />
+
           {submitted ? (
-            <div className="mt-14">
+            <div>
               <TaskSubmitStatus
                 taskTitle={task.title}
                 reward={task.reward}
@@ -165,7 +168,7 @@ export function TaskSubmit({
               />
             </div>
           ) : (
-            <section className="mt-14">
+            <section>
               <TaskSubmitForm
                 details={details}
                 videoUrl={videoUrl}
@@ -199,29 +202,33 @@ export function TaskSubmit({
         </div>
 
         <aside className="lg:sticky lg:top-28">
-          <div className="border-t border-white/8 pt-6">
-            <p className="label">Reward</p>
-            <p className="stat-value mt-3 text-4xl text-foreground">
-              {formatUsdCompact(task.reward.amountCents)}
-            </p>
-            <p className="mt-1 font-mono text-sm text-accent">
-              {task.reward.ticker}
-            </p>
+          <div className="glass-panel p-7">
+            <div className="text-center">
+              <p className="label">Reward</p>
+              <p className="stat-value mt-3 text-4xl text-foreground">
+                {formatUsdCompact(task.reward.amountCents)}
+              </p>
+              <p className="mt-2 font-mono text-sm text-accent">
+                {task.reward.ticker}
+              </p>
+            </div>
 
-            <dl className="mt-8 space-y-4 border-t border-white/8 pt-5 text-sm">
+            <hr className="hairline my-7" />
+
+            <dl className="space-y-4 text-sm">
               <div className="flex justify-between gap-4">
-                <dt className="text-foreground/40">Task</dt>
-                <dd className="text-right text-foreground/80">{task.title}</dd>
+                <dt className="text-foreground/42">Task</dt>
+                <dd className="text-right text-foreground/82">{task.title}</dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-foreground/40">Status</dt>
-                <dd className="text-right text-foreground/80">
+                <dt className="text-foreground/42">Status</dt>
+                <dd className="text-right text-foreground/82">
                   {submitted ? "Payout pending" : "Not submitted"}
                 </dd>
               </div>
               <div className="flex justify-between gap-4">
-                <dt className="text-foreground/40">Reward</dt>
-                <dd className="text-right text-foreground/80">Not issued</dd>
+                <dt className="text-foreground/42">Reward</dt>
+                <dd className="text-right text-foreground/82">Not issued</dd>
               </div>
             </dl>
           </div>

@@ -10,13 +10,14 @@ export function FeaturedTasks({ tasks }: { tasks: TaskView[] }) {
       <PageContainer>
         <Reveal>
           <SectionHeading
+            align="center"
             eyebrow="Featured tasks"
             title="A few tasks from the catalog."
             description="These are existing listings. Each card opens the task detail page."
           />
         </Reveal>
-        <Reveal className="mt-12">
-          <div className="home-task-grid grid gap-px overflow-hidden rounded-[22px] border border-white/8 bg-white/8 md:grid-cols-2">
+        <Reveal className="mt-14">
+          <div className="home-task-grid grid gap-4 md:grid-cols-2">
             {tasks.map((task) => (
               <TaskCard key={task.id} task={task} motion />
             ))}

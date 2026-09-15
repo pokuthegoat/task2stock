@@ -44,7 +44,7 @@ export function TaskSubmitForm({
       <div>
         <p className="label">File proof</p>
         <label
-          className="mt-3 flex min-h-48 cursor-pointer flex-col items-center justify-center rounded-[22px] border border-dashed border-white/16 bg-white/[0.03] px-5 py-10 text-center transition-colors hover:bg-white/[0.05]"
+          className="glass-tile mt-3 flex min-h-48 cursor-pointer flex-col items-center justify-center border-dashed border-white/18 px-5 py-10 text-center transition hover:border-white/28 hover:brightness-110"
           onDragOver={(event) => {
             event.preventDefault();
           }}
@@ -78,7 +78,7 @@ export function TaskSubmitForm({
         </label>
 
         {selectedFile ? (
-          <div className="mt-4 flex items-center justify-between gap-4 border-t border-white/8 pt-4">
+          <div className="glass-tile mt-3 flex items-center justify-between gap-4 p-5">
             <div>
               <p className="text-sm font-medium text-foreground">
                 {selectedFile.name}
@@ -147,7 +147,7 @@ export function TaskSubmitForm({
         ) : null}
       </div>
 
-      <Button type="submit" className="w-full" disabled={pending}>
+      <Button type="submit" size="lg" className="w-full" disabled={pending}>
         {pending ? "Submitting…" : "Submit"}
       </Button>
     </form>

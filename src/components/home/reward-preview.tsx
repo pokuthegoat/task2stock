@@ -11,26 +11,28 @@ export function RewardPreview({ items }: { items: HomeRewardPreview[] }) {
       <PageContainer>
         <Reveal>
           <SectionHeading
+            align="center"
             eyebrow="Rewards"
             title="Work, and earn stocks."
-            description="These amounts and tickers are the catalog RewardOffer on each task. Settlement is not live."
+            description="These amounts and tickers are the catalog RewardOffer on each task."
           />
         </Reveal>
-        <Reveal className="mt-12">
-          <ul className="divide-y divide-white/8 border-y border-white/8">
+        <Reveal className="mt-14">
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (
               <li key={item.taskId} className="reward-row">
                 <Link
                   href={`/tasks/${item.taskId}`}
-                  className="flex flex-col gap-3 py-6 transition-colors hover:text-accent sm:flex-row sm:items-center sm:justify-between"
+                  className="glass-tile glass-tile-hover flex h-full flex-col items-center p-7 text-center"
                 >
-                  <div>
-                    <p className="label">{item.companyName}</p>
-                    <p className="mt-2 text-lg font-semibold tracking-tight text-foreground">
-                      {item.title}
-                    </p>
-                  </div>
-                  <RewardBadge offer={item.offer} example={false} motion />
+                  <p className="label">{item.companyName}</p>
+                  <p className="mt-3 flex-1 text-lg font-semibold leading-7 tracking-tight text-foreground">
+                    {item.title}
+                  </p>
+                  <hr className="hairline my-6 w-full" />
+                  <span className="text-xl">
+                    <RewardBadge offer={item.offer} example={false} motion />
+                  </span>
                 </Link>
               </li>
             ))}

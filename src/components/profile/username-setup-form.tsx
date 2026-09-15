@@ -28,7 +28,7 @@ export function UsernameSetupForm() {
         hint="3–20 characters. Start with a letter. Letters, numbers, and underscores only."
         placeholder="josh"
       />
-      <Button type="submit" disabled={pending} className="w-full">
+      <Button type="submit" size="lg" disabled={pending} className="w-full">
         Continue
       </Button>
     </form>

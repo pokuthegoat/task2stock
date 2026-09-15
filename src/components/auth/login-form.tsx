@@ -49,7 +49,7 @@ export function LoginForm({ notice = null }: { notice?: string | null }) {
           onChange={setPassword}
           error={state.errors.password}
         />
-        <Button type="submit" disabled={pending} className="w-full">
+        <Button type="submit" size="lg" disabled={pending} className="w-full">
           Sign in
         </Button>
       </form>

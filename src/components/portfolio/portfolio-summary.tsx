@@ -31,7 +31,7 @@ const stats = [
 export function PortfolioSummary() {
   return (
     <section>
-      <PageContainer className="grid gap-8 border-y border-white/8 py-8 sm:grid-cols-2 lg:grid-cols-4">
+      <PageContainer className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <Stat
             key={stat.label}

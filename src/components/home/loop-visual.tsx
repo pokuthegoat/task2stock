@@ -46,7 +46,8 @@ export function LoopVisual({ stage }: { stage: LoopStage }) {
 
   return (
     <GlassSurface
-      className="relative w-full overflow-hidden p-6 md:p-7"
+      tier="panel"
+      className="relative w-full overflow-hidden p-6 md:p-8"
       aria-hidden="true"
     >
       <div className="flex items-center gap-2">
@@ -74,7 +75,7 @@ export function LoopVisual({ stage }: { stage: LoopStage }) {
 
       <div className="relative mt-6 grid min-h-[176px]">
         <StateBlock active={index === 0}>
-          <div className="story-pop rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-4">
+          <div className="story-pop glass-tile px-4 py-4">
             <p className="text-sm font-medium text-foreground">Available</p>
             <p className="mt-1 text-xs text-foreground/42">
               An open opportunity in the catalog
@@ -98,12 +99,13 @@ export function LoopVisual({ stage }: { stage: LoopStage }) {
         </StateBlock>
 
         <StateBlock active={index === 2}>
-          <div className="story-slide rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-4">
+          <div className="story-slide glass-tile px-4 py-4">
             <p className="text-sm font-medium text-foreground">
               <span className="mr-1.5 text-accent">✓</span>
               Task completed
             </p>
-            <div className="mt-3 flex items-center justify-between gap-3 border-t border-white/8 pt-3">
+            <hr className="hairline my-3" />
+            <div className="flex items-center justify-between gap-3">
               <p className="text-xs text-foreground/55">proof.jpg</p>
               <p className="text-xs text-accent">Submitted</p>
             </div>
@@ -111,7 +113,7 @@ export function LoopVisual({ stage }: { stage: LoopStage }) {
         </StateBlock>
 
         <StateBlock active={index === 3}>
-          <div className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-4">
+          <div className="glass-tile px-4 py-4">
             <p className="text-sm font-medium text-foreground">
               Pending verification
             </p>
@@ -122,16 +124,11 @@ export function LoopVisual({ stage }: { stage: LoopStage }) {
         </StateBlock>
 
         <StateBlock active={index === 4}>
-          <div className="story-reward flex items-center gap-3">
-            <BrandMark size={36} className="rounded-xl" />
-            <div>
-              <p className="text-2xl font-medium tracking-tight text-accent">
-                + $15 NVDA
-              </p>
-              <p className="mt-1 text-xs text-foreground/40">
-                Catalog example. Settlement is not live.
-              </p>
-            </div>
+          <div className="story-reward glass-tile flex items-center gap-3.5 px-4 py-4">
+            <BrandMark size={38} className="rounded-xl" />
+            <p className="text-2xl font-medium tracking-tight text-accent">
+              + $15 NVDA
+            </p>
           </div>
         </StateBlock>
 
@@ -139,22 +136,19 @@ export function LoopVisual({ stage }: { stage: LoopStage }) {
           <div>
             <p className="label">Illustration</p>
             <div className="mt-3 space-y-2">
-              <div className="story-own-row flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.035] px-3 py-2.5">
+              <div className="story-own-row glass-chip flex items-center justify-between rounded-2xl px-4 py-2.5">
                 <p className="text-sm font-medium text-foreground">NVDA</p>
                 <p className="text-sm text-accent">$15</p>
               </div>
-              <div className="flex items-center justify-between rounded-xl border border-dashed border-white/10 px-3 py-2.5">
-                <p className="text-sm text-foreground/35">Next reward</p>
-                <p className="text-sm text-foreground/28">—</p>
+              <div className="flex items-center justify-between rounded-2xl border border-dashed border-white/12 px-4 py-2.5">
+                <p className="text-sm text-foreground/38">Next reward</p>
+                <p className="text-sm text-foreground/30">—</p>
               </div>
-              <div className="flex items-center justify-between rounded-xl border border-dashed border-white/10 px-3 py-2.5">
-                <p className="text-sm text-foreground/35">Collects over time</p>
-                <p className="text-sm text-foreground/28">—</p>
+              <div className="flex items-center justify-between rounded-2xl border border-dashed border-white/12 px-4 py-2.5">
+                <p className="text-sm text-foreground/38">Collects over time</p>
+                <p className="text-sm text-foreground/30">—</p>
               </div>
             </div>
-            <p className="mt-3 text-[11px] leading-4 text-foreground/38">
-              Narrative only — not a live portfolio.
-            </p>
           </div>
         </StateBlock>
       </div>
