@@ -1,3 +1,4 @@
+import { FlowVisual } from "@/components/home/flow-visual";
 import { PageContainer } from "@/components/ui/page-container";
 import { Reveal } from "@/components/ui/reveal";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -28,7 +29,10 @@ export function Why() {
             description="The idea is simple. Do the task. Earn a stock-oriented reward."
           />
         </Reveal>
-        <ol className="mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
+        <Reveal className="mt-12">
+          <FlowVisual />
+        </Reveal>
+        <ol className="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
           {points.map((point, index) => (
             <li key={point.title}>
               <Reveal delay={index * 90}>

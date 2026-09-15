@@ -436,6 +436,156 @@ body {
   }
 }
 
+/* Why section: an asset travelling task → reward → ownership. */
+.flow-track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  padding-top: 0.5rem;
+}
+
+/* Rider and line span node-1 centre to node-3 centre (1/6 .. 5/6). */
+.flow-line {
+  position: absolute;
+  left: 16.6667%;
+  right: 16.6667%;
+  bottom: 4px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.05)
+  );
+}
+
+.flow-rider {
+  position: absolute;
+  left: 16.6667%;
+  right: 16.6667%;
+  bottom: 4px;
+  display: block;
+  height: 0;
+  opacity: 0;
+}
+
+.flow-token {
+  position: absolute;
+  top: -13px;
+  left: -13px;
+}
+
+.flow-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.95rem;
+  text-align: center;
+}
+
+.flow-dot {
+  order: 2;
+  height: 9px;
+  width: 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.flow-label {
+  order: 1;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(246, 244, 240, 0.48);
+}
+
+.reveal-on-scroll.is-visible .flow-rider {
+  animation: flow-travel 9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.reveal-on-scroll.is-visible .flow-node {
+  animation: flow-arrive 9s ease-in-out infinite;
+}
+
+@keyframes flow-travel {
+  0%,
+  6% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  10%,
+  28% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  38%,
+  58% {
+    transform: translateX(50%);
+    opacity: 1;
+  }
+  68%,
+  90% {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes flow-arrive {
+  0%,
+  8% {
+    opacity: 0.55;
+  }
+  14%,
+  26% {
+    opacity: 1;
+  }
+  34%,
+  100% {
+    opacity: 0.55;
+  }
+}
+
+/* Final CTA: rewards accumulating over time. */
+.growth-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.6rem;
+  height: 76px;
+}
+
+.growth-bar {
+  width: 26px;
+  border-radius: 8px 8px 3px 3px;
+  background: linear-gradient(
+    180deg,
+    rgba(239, 232, 220, 0.55),
+    rgba(239, 232, 220, 0.14)
+  );
+  transform: scaleY(0);
+  transform-origin: bottom;
+}
+
+.reveal-on-scroll.is-visible .growth-bar {
+  animation: growth-rise 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes growth-rise {
+  from {
+    transform: scaleY(0);
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
 @keyframes reveal-up {
   from {
     opacity: 0;
@@ -509,7 +659,19 @@ body {
   .story-state[data-active="true"] .story-reward,
   .story-state[data-active="true"] .story-own-row,
   .reveal-on-scroll.is-visible .reward-row,
-  .reveal-on-scroll.is-visible .reward-enter {
+  .reveal-on-scroll.is-visible .reward-enter,
+  .reveal-on-scroll.is-visible .flow-rider,
+  .reveal-on-scroll.is-visible .flow-node,
+  .reveal-on-scroll.is-visible .growth-bar {
     animation: none;
+  }
+
+  /* Static equivalents for the narrative visuals. */
+  .flow-rider {
+    opacity: 1;
+  }
+
+  .growth-bar {
+    transform: scaleY(1);
   }
 }
