@@ -41,8 +41,11 @@ async function main() {
     });
   }
 
+  const lineIds: string[] = [];
+
   for (const line of taskLines) {
     const id = taskLineId(line.taskId, line.kind, line.sortOrder);
+    lineIds.push(id);
 
     await prisma.taskLine.upsert({
       where: { id },
@@ -52,7 +55,7 @@ async function main() {
   }
 
   await prisma.taskLine.deleteMany({
-    where: { body: "Example listing only — not a live offer." },
+    where: { id: { notIn: lineIds } },
   });
 
   const counts = {

@@ -63,14 +63,14 @@ export function LoopVisual({ stage }: { stage: LoopStage }) {
 
       <p className="label mt-7">{labels[stage]}</p>
       <p className="mt-3 text-lg font-medium tracking-tight text-foreground">
-        Run 20 kilometers this month
+        Complete and document a 10 km run
       </p>
       <p
         className={`overflow-hidden text-xs text-foreground/40 transition-[opacity,max-height,margin] duration-500 motion-reduce:transition-none ${
           index <= 1 ? "mt-1 max-h-5 opacity-100" : "mt-0 max-h-0 opacity-0"
         }`}
       >
-        Northstar Athletics
+        Strava
       </p>
 
       <div className="relative mt-6 grid min-h-[176px]">
@@ -86,7 +86,7 @@ export function LoopVisual({ stage }: { stage: LoopStage }) {
         <StateBlock active={index === 1}>
           <div>
             <div className="flex items-end justify-between gap-4">
-              <p className="text-sm font-medium text-foreground">16 / 20 km</p>
+              <p className="text-sm font-medium text-foreground">8 / 10 km</p>
               <p className="text-xs text-foreground/40">In progress</p>
             </div>
             <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10">

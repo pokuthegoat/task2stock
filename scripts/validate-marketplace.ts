@@ -26,12 +26,12 @@ function main() {
     throw new Error(`Unexpected reward ranges: ${JSON.stringify(ranges)}`);
   }
 
-  const merchandising = applyMarketplaceQuery(tasks, {
+  const dlss = applyMarketplaceQuery(tasks, {
     ...emptyMarketplaceQuery,
-    q: "merchandising",
+    q: "DLSS",
   });
 
-  if (ids(merchandising).join() !== "store-photos") {
+  if (ids(dlss).join() !== "product-video") {
     throw new Error("Search must match description/requirement text.");
   }
 
@@ -89,7 +89,7 @@ function main() {
   console.log("Marketplace findability checks passed.");
   console.log({
     ranges: ranges.map((range) => range.label),
-    merchandising: ids(merchandising),
+    dlss: ids(dlss),
     retail: ids(retail),
     highest: ids(highest).slice(0, 3),
     shortest: ids(shortest).slice(0, 2),

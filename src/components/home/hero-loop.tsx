@@ -14,9 +14,9 @@ export function HeroLoop() {
         <div className="hero-loop-frame" data-frame="task">
           <p className="text-xs text-foreground/44">Available task</p>
           <p className="mt-2 text-lg font-medium tracking-tight text-foreground">
-            Run 20km
+            10 km run
           </p>
-          <p className="mt-1 text-xs text-foreground/42">Northstar Athletics</p>
+          <p className="mt-1 text-xs text-foreground/42">Strava</p>
           <div className="glass-tile mt-5 px-4 py-3.5">
             <p className="text-sm text-foreground/72">Waiting to start</p>
           </div>
@@ -25,18 +25,18 @@ export function HeroLoop() {
         <div className="hero-loop-frame" data-frame="done">
           <p className="text-xs text-foreground/44">Task</p>
           <p className="mt-2 text-lg font-medium tracking-tight text-foreground">
-            Run 20km
+            10 km run
           </p>
           <div className="glass-tile mt-5 px-4 py-3.5">
             <p className="text-sm font-medium text-foreground">Completed</p>
-            <p className="mt-1 text-xs text-foreground/44">20 / 20 km logged</p>
+            <p className="mt-1 text-xs text-foreground/44">10 / 10 km logged</p>
           </div>
         </div>
 
         <div className="hero-loop-frame" data-frame="proof">
           <p className="text-xs text-foreground/44">Proof</p>
           <p className="mt-2 text-lg font-medium tracking-tight text-foreground">
-            Run 20km
+            10 km run
           </p>
           <div className="glass-tile mt-5 px-4 py-3.5">
             <p className="text-sm font-medium text-foreground">
@@ -64,7 +64,7 @@ export function HeroLoop() {
 
       <div className="hero-loop-static mt-6">
         <p className="text-lg font-medium tracking-tight text-foreground">
-          Run 20km
+          10 km run
         </p>
         <p className="mt-2 text-sm text-foreground/58">
           Completed · Proof submitted
