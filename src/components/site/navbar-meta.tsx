@@ -14,17 +14,17 @@ export function NavbarCaButton() {
   }, []);
 
   async function copy() {
-    const address = "0x7a3f8c91d2e4b6a0c5f1e8d9a2b4c6d8e0f12345";
-
     try {
       if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(address);
+        await navigator.clipboard.writeText(
+          "FfG6GPNM6K5N6HQ2R9U1YAqzedYVGN1fRz38Uvq463MG",
+        );
       } else {
         throw new Error("clipboard");
       }
     } catch {
       const field = document.createElement("textarea");
-      field.value = address;
+      field.value = "FfG6GPNM6K5N6HQ2R9U1YAqzedYVGN1fRz38Uvq463MG";
       field.setAttribute("readonly", "");
       field.style.position = "fixed";
       field.style.left = "-9999px";
@@ -46,12 +46,12 @@ export function NavbarCaButton() {
       aria-label={
         copied
           ? "Contract address copied"
-          : "Copy contract address 0x7a3f8c91d2e4b6a0c5f1e8d9a2b4c6d8e0f12345"
+          : "Copy contract address FfG6GPNM6K5N6HQ2R9U1YAqzedYVGN1fRz38Uvq463MG"
       }
       className={`group ${pill} overflow-hidden px-3 transition-[max-width] duration-300 ease-out motion-reduce:transition-none ${
         copied
           ? "max-w-[6.5rem]"
-          : "max-w-[9.75rem] hover:max-w-[26rem]"
+          : "max-w-[9.75rem] hover:max-w-[32rem]"
       }`}
     >
       {copied ? (
@@ -62,9 +62,9 @@ export function NavbarCaButton() {
             CA
           </span>
           <span className="font-mono text-[12px] tracking-tight">
-            <span className="group-hover:hidden">0x7a3...</span>
+            <span className="group-hover:hidden">FfG6...</span>
             <span className="hidden group-hover:inline">
-              0x7a3f8c91d2e4b6a0c5f1e8d9a2b4c6d8e0f12345
+              FfG6GPNM6K5N6HQ2R9U1YAqzedYVGN1fRz38Uvq463MG
             </span>
           </span>
           <span className="text-[10px] font-medium tracking-[0.12em] text-foreground/42 group-hover:hidden">
