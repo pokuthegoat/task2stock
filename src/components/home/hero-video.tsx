@@ -10,15 +10,15 @@ function clamp(value: number, min: number, max: number) {
 }
 
 export function HeroVideo() {
-  const frameRef = useRef<HTMLDivElement>(null);
+  const layerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    const frame = frameRef.current;
+    const layer = layerRef.current;
     const video = videoRef.current;
 
-    if (!frame || !video) {
+    if (!layer || !video) {
       return;
     }
 
@@ -29,6 +29,10 @@ export function HeroVideo() {
       return;
     }
 
+    const compact = window.matchMedia("(max-width: 640px)").matches;
+    const ease = compact ? 0.24 : 0.16;
+    const step = compact ? 0.05 : 0.03;
+
     let raf = 0;
     let target = 0;
     let shown = 0;
@@ -36,7 +40,7 @@ export function HeroVideo() {
     let range = 1;
 
     const measure = () => {
-      const rect = frame.getBoundingClientRect();
+      const rect = layer.getBoundingClientRect();
       range = Math.max(rect.bottom + window.scrollY, 1);
     };
 
@@ -45,7 +49,7 @@ export function HeroVideo() {
         return;
       }
 
-      if (Math.abs(video.currentTime - shown) > 0.03) {
+      if (Math.abs(video.currentTime - shown) > step) {
         video.currentTime = shown;
       }
     };
@@ -61,7 +65,7 @@ export function HeroVideo() {
         return;
       }
 
-      shown += diff * 0.16;
+      shown += diff * ease;
       seek();
       raf = window.requestAnimationFrame(tick);
     };
@@ -102,7 +106,7 @@ export function HeroVideo() {
       { rootMargin: "120px 0px" },
     );
 
-    observer.observe(frame);
+    observer.observe(layer);
     measure();
     video.addEventListener("loadedmetadata", update);
     window.addEventListener("scroll", update, { passive: true });
@@ -118,28 +122,27 @@ export function HeroVideo() {
     };
   }, []);
 
-  if (failed) {
-    return null;
-  }
-
   return (
     <div
-      ref={frameRef}
-      className="hero-video-frame aspect-[16/10] w-full sm:aspect-[2/1] lg:aspect-[21/9]"
+      ref={layerRef}
       aria-hidden="true"
+      className="hero-video-layer pointer-events-none absolute inset-x-0 -top-16 bottom-0 z-0 overflow-hidden md:-top-[72px]"
     >
-      <video
-        ref={videoRef}
-        muted
-        playsInline
-        preload="auto"
-        disablePictureInPicture
-        tabIndex={-1}
-        onError={() => setFailed(true)}
-      >
-        <source src={HERO_VIDEO} type="video/mp4" />
-      </video>
-      <span className="hero-video-veil" />
+      {failed ? null : (
+        <video
+          ref={videoRef}
+          className="hero-video-media"
+          muted
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+          tabIndex={-1}
+          onError={() => setFailed(true)}
+        >
+          <source src={HERO_VIDEO} type="video/mp4" />
+        </video>
+      )}
+      <span className="hero-video-scrim" />
     </div>
   );
 }

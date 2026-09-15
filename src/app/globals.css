@@ -242,40 +242,37 @@ body {
   -webkit-backdrop-filter: blur(11px) saturate(160%);
 }
 
-/* Header video framed as a glass panel. */
-.hero-video-frame {
-  position: relative;
-  overflow: hidden;
-  border-radius: 26px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.03);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    0 24px 60px rgba(0, 0, 0, 0.32);
+/* Full-bleed hero background video. */
+.hero-video-layer {
+  background-color: #101014;
 }
 
-.hero-video-frame video {
+.hero-video-media {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  /* Dulled so the headline stays the focus: darker, desaturated, softened. */
+  filter: saturate(0.68) brightness(0.58) contrast(1.04) blur(0.4px);
+  transform: scale(1.03);
 }
 
-.hero-video-veil {
+.hero-video-scrim {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(
-      110% 80% at 10% -10%,
-      rgba(255, 255, 255, 0.12),
-      transparent 56%
-    ),
     linear-gradient(
       180deg,
-      rgba(13, 13, 16, 0.12),
-      rgba(13, 13, 16, 0.34) 78%,
-      rgba(13, 13, 16, 0.58)
+      rgba(13, 13, 16, 0.64),
+      rgba(13, 13, 16, 0.38) 34%,
+      rgba(13, 13, 16, 0.62) 78%,
+      var(--background)
+    ),
+    radial-gradient(
+      120% 90% at 18% 24%,
+      rgba(13, 13, 16, 0.08),
+      rgba(13, 13, 16, 0.5) 72%
     );
 }
 
