@@ -18,6 +18,8 @@ model User {
   email         String?  @unique
   /// Google OIDC subject. Stable identity for Google sign-in. Null for email/password-only users.
   googleSub     String?  @unique
+  /// Privy user DID. Stable identity for Login with Privy.
+  privyDid      String?  @unique
   /// scrypt hash for email/password accounts. Null for Google-only users.
   passwordHash  String?
   avatarUrl     String?

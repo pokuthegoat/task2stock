@@ -5,8 +5,7 @@ const links = [
   { href: "/tasks", label: "Tasks" },
   { href: "/#how-it-works", label: "How it works" },
   { href: "/contact", label: "Contact" },
-  { href: "/login", label: "Sign in" },
-  { href: "/signup", label: "Sign up" },
+  { href: "/login", label: "Login with Privy" },
 ];
 
 export function Footer() {

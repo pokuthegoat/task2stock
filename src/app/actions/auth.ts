@@ -3,11 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { afterAuthPath } from "@/lib/auth/profile-gate";
+import { verifyPrivyAccessToken } from "@/lib/auth/privy";
 import {
+  findOrCreatePrivyUser,
   signInWithPassword,
   signOut as clearSession,
   signUpWithPassword,
 } from "@/lib/auth/provider";
+import { replaceSessionsForUser } from "@/lib/auth/session";
 import type { AuthFormState } from "@/lib/auth/types";
 import {
   hasFieldErrors,
@@ -68,4 +71,24 @@ export async function signUpAction(
 export async function signOutAction() {
   await clearSession();
   revalidatePath("/", "layout");
+}
+
+export async function completePrivySessionAction(accessToken: string) {
+  try {
+    const identity = await verifyPrivyAccessToken(accessToken);
+    const result = await findOrCreatePrivyUser(identity);
+
+    if (!result.ok) {
+      return { ok: false as const, error: result.message };
+    }
+
+    await replaceSessionsForUser(result.user.id);
+    revalidatePath("/", "layout");
+    return { ok: true as const, next: afterAuthPath(result.user) };
+  } catch {
+    return {
+      ok: false as const,
+      error: "Privy login could not be verified. Try again.",
+    };
+  }
 }

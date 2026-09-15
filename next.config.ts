@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ["@privy-io/node"],
   experimental: {
     serverActions: {
       bodySizeLimit: "12mb",

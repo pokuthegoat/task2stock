@@ -7,7 +7,7 @@ import type { SubmissionId } from "@/lib/domain/model";
 
 /**
  * Trusted operator path. Marks a verified reward as issued.
- * Does not pay, settle, or create a Holding.
+ * Does not pay or settle. Payouts go through the user's Privy wallet, not Task2Stock.
  */
 export async function issueRewardAction(submissionId: SubmissionId) {
   const actorUserId = await getManualVerificationActorId();

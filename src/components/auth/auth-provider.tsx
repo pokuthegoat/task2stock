@@ -1,5 +1,6 @@
 "use client";
 
+import { usePrivy } from "@privy-io/react-auth";
 import { createContext, useContext, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { signOutAction } from "@/app/actions/auth";
@@ -20,16 +21,22 @@ export function AuthProvider({
   initialUser: AuthUser | null;
 }) {
   const router = useRouter();
+  const { logout } = usePrivy();
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user: initialUser,
       async signOut() {
+        try {
+          await logout();
+        } catch {
+          // Privy may already be signed out.
+        }
         await signOutAction();
         router.refresh();
       },
     }),
-    [initialUser, router],
+    [initialUser, logout, router],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

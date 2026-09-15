@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/components/auth/auth-provider";
+import { PrivyLoginButton } from "@/components/auth/privy-login-button";
 import { Logo } from "@/components/site/logo";
 import { NavbarMetaButtons } from "@/components/site/navbar-meta";
 import { Button } from "@/components/ui/button";
@@ -74,9 +75,11 @@ export function Navbar() {
               </Button>
             ) : (
               <>
-                <Button href="/login" variant="ghost" size="sm">
-                  Sign in
-                </Button>
+                <PrivyLoginButton
+                  size="sm"
+                  variant="ghost"
+                  compact
+                />
                 <Button href="/tasks" size="sm">
                   Start earning
                 </Button>
@@ -147,13 +150,12 @@ export function Navbar() {
                 </Button>
               ) : (
                 <>
-                  <Button
-                    href="/login"
+                  <PrivyLoginButton
+                    size="md"
                     variant="secondary"
-                    onClick={() => setOpen(false)}
-                  >
-                    Sign in
-                  </Button>
+                    className="w-full"
+                    compact
+                  />
                   <Button href="/tasks" onClick={() => setOpen(false)}>
                     Start earning
                   </Button>

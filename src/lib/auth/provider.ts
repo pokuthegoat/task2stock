@@ -174,6 +174,131 @@ export async function findOrCreateGoogleUser(input: {
   }
 }
 
+const privyUserSelect = {
+  ...userSelect,
+  privyDid: true,
+  walletAddress: true,
+} as const;
+
+export async function findOrCreatePrivyUser(input: {
+  did: string;
+  email: string | null;
+  name: string;
+  walletAddress: string | null;
+}): Promise<AuthResult> {
+  const privyDid = input.did.trim();
+  const email = input.email ? input.email.trim().toLowerCase() : null;
+  const name = input.name.trim() || email?.split("@")[0] || "Privy user";
+  const walletAddress = input.walletAddress?.trim() || null;
+
+  if (!privyDid) {
+    return toAuthUnavailableResult();
+  }
+
+  try {
+    const byDid = await getPrisma().user.findUnique({
+      where: { privyDid },
+      select: privyUserSelect,
+    });
+
+    if (byDid) {
+      const nextWallet =
+        walletAddress && byDid.walletAddress !== walletAddress
+          ? walletAddress
+          : undefined;
+
+      if (nextWallet) {
+        const updated = await getPrisma().user.update({
+          where: { id: byDid.id },
+          data: { walletAddress: nextWallet },
+          select: privyUserSelect,
+        });
+        return { ok: true, user: toAuthUser(updated) };
+      }
+
+      return { ok: true, user: toAuthUser(byDid) };
+    }
+
+    if (email) {
+      const byEmail = await getPrisma().user.findUnique({
+        where: { email },
+        select: privyUserSelect,
+      });
+
+      if (byEmail) {
+        if (byEmail.privyDid && byEmail.privyDid !== privyDid) {
+          return {
+            ok: false,
+            code: "EMAIL_TAKEN",
+            message: "An account with this email already exists.",
+          };
+        }
+
+        const linked = await getPrisma().user.update({
+          where: { id: byEmail.id },
+          data: {
+            privyDid,
+            walletAddress: walletAddress ?? byEmail.walletAddress,
+          },
+          select: privyUserSelect,
+        });
+
+        return { ok: true, user: toAuthUser(linked) };
+      }
+    }
+
+    const created = await getPrisma().user.create({
+      data: {
+        id: crypto.randomUUID(),
+        name,
+        email,
+        privyDid,
+        walletAddress,
+        passwordHash: null,
+      },
+      select: privyUserSelect,
+    });
+
+    return { ok: true, user: toAuthUser(created) };
+  } catch (error) {
+    if (isDuplicateConstraintError(error)) {
+      const existing = await getPrisma().user.findUnique({
+        where: { privyDid },
+        select: privyUserSelect,
+      });
+
+      if (existing) {
+        return { ok: true, user: toAuthUser(existing) };
+      }
+
+      if (walletAddress) {
+        try {
+          const created = await getPrisma().user.create({
+            data: {
+              id: crypto.randomUUID(),
+              name,
+              email,
+              privyDid,
+              walletAddress: null,
+              passwordHash: null,
+            },
+            select: privyUserSelect,
+          });
+          return { ok: true, user: toAuthUser(created) };
+        } catch (retryError) {
+          if (!isDuplicateConstraintError(retryError)) {
+            logDatabaseError("privySignIn", retryError);
+            return toAuthUnavailableResult();
+          }
+        }
+      }
+    }
+
+    logDatabaseError("privySignIn", error);
+    return toAuthUnavailableResult();
+  }
+}
+
 export async function signOut(): Promise<void> {
   await destroySession();
 }
