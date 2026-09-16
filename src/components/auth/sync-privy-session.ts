@@ -65,6 +65,11 @@ async function postPrivySession(
   }
 
   if (!response.ok || !data.ok || !data.next) {
+    console.error(
+      "[task2stock:privy] POST /api/auth/privy failed",
+      response.status,
+      data,
+    );
     return {
       ok: false,
       error: data.error || "Privy login could not be verified. Try again.",

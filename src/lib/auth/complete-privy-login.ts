@@ -55,6 +55,15 @@ export async function completePrivyLogin(input: {
     };
   } catch (error) {
     console.error("[task2stock:privy] session complete failed", error);
+    const message = error instanceof Error ? error.message : "";
+
+    if (/missing privy token/i.test(message)) {
+      return {
+        ok: false,
+        error: "Privy did not return a session token.",
+      };
+    }
+
     return {
       ok: false,
       error: "Privy login could not be verified. Try again.",

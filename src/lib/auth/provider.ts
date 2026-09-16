@@ -351,6 +351,22 @@ export async function findOrCreatePrivyUser(input: {
     }
 
     logDatabaseError("privySignIn", error);
+
+    if (
+      error instanceof Error &&
+      /no such column:.*privyDid/i.test(error.message)
+    ) {
+      console.error(
+        "[task2stock:privy] Turso schema is missing User.privyDid. Run: npm run db:turso-migrate",
+      );
+      return {
+        ok: false,
+        code: "UNAVAILABLE",
+        message:
+          "Account storage is not ready (missing privyDid). Apply Turso migrations.",
+      };
+    }
+
     return toAuthUnavailableResult();
   }
 }
