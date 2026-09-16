@@ -1,14 +1,43 @@
+"use client";
+
+import { useState } from "react";
+
+const CONTRACT_ADDRESS = "0x4f101f97f908a9f229c8c623d7f57d3df7099bb4";
+
 const pill =
   "glass-chip inline-flex h-9 items-center justify-center text-[12px] font-medium text-foreground/78 transition hover:brightness-110 hover:text-foreground";
 
+function shortenAddress(address: string) {
+  return `${address.slice(0, 6)}…${address.slice(-4)}`;
+}
+
 export function NavbarCaButton() {
+  const [copied, setCopied] = useState(false);
+
+  async function copyAddress() {
+    try {
+      await navigator.clipboard.writeText(CONTRACT_ADDRESS);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1400);
+    } catch {
+      // Clipboard can fail without a secure context or permission.
+    }
+  }
+
   return (
-    <span
-      aria-label="Contract address not applicable"
-      className={`${pill} px-3`}
+    <button
+      type="button"
+      onClick={() => void copyAddress()}
+      aria-label={
+        copied
+          ? "Contract address copied"
+          : `Copy contract address ${CONTRACT_ADDRESS}`
+      }
+      title={CONTRACT_ADDRESS}
+      className={`${pill} cursor-pointer px-3`}
     >
-      ca not applicable
-    </span>
+      {copied ? "copied" : `ca ${shortenAddress(CONTRACT_ADDRESS)}`}
+    </button>
   );
 }
 
