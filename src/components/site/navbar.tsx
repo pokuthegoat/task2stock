@@ -79,6 +79,7 @@ export function Navbar() {
                   size="sm"
                   variant="ghost"
                   compact
+                  label="Connect Wallet"
                 />
                 <Button href="/tasks" size="sm">
                   Start earning
@@ -155,6 +156,7 @@ export function Navbar() {
                     variant="secondary"
                     className="w-full"
                     compact
+                    label="Connect Wallet"
                   />
                   <Button href="/tasks" onClick={() => setOpen(false)}>
                     Start earning

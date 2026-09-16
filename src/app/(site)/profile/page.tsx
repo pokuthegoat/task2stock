@@ -8,7 +8,6 @@ import {
 import { ProfileAvatar } from "@/components/profile/profile-avatar";
 import { ProfilePasswordForm } from "@/components/profile/profile-password-form";
 import { ProfileTextForm } from "@/components/profile/profile-text-form";
-import { PrivyWalletCard } from "@/components/wallet/privy-wallet-card";
 import { PageContainer } from "@/components/ui/page-container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { getProfileByUserId } from "@/lib/auth/profile";
@@ -88,8 +87,6 @@ export default async function ProfilePage() {
                 />
               </div>
             </div>
-
-            <PrivyWalletCard />
 
             <div className="glass-panel p-7 md:p-10">
               <p className="label">Account &amp; security</p>

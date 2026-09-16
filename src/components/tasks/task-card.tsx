@@ -1,8 +1,7 @@
-import type { CSSProperties } from "react";
 import { GlowLink } from "@/components/ui/glow-link";
 import { RewardBadge } from "@/components/ui/reward-badge";
 import type { TaskView } from "@/lib/data";
-import { companyAccent, taskKind } from "@/lib/tasks/presentation";
+import { taskKind } from "@/lib/tasks/presentation";
 
 export function TaskCard({
   task,
@@ -14,13 +13,11 @@ export function TaskCard({
   motion?: boolean;
 }) {
   const kind = taskKind(task);
-  const accent = companyAccent(task.company.name);
 
   return (
     <GlowLink
       href={`/tasks/${task.id}`}
-      className="task-accent-edge glass-tile glass-tile-hover group flex h-full flex-col p-6 md:p-7"
-      style={{ "--task-accent": accent } as CSSProperties}
+      className="glass-tile glass-tile-hover group flex h-full flex-col p-6 md:p-7"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-wrap items-center gap-2">
