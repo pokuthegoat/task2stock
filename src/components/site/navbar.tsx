@@ -90,7 +90,7 @@ export function Navbar() {
 
           <button
             type="button"
-            className="glass-chip flex h-10 w-10 items-center justify-center text-foreground transition hover:brightness-110 md:hidden"
+            className="glass-chip flex h-10 w-10 items-center justify-center text-foreground transition md:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             onClick={() => setOpen((value) => !value)}

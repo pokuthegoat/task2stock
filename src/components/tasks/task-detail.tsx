@@ -22,7 +22,7 @@ export function TaskDetail({ task }: { task: TaskView }) {
     <PageContainer className="pb-24 pt-10 md:pb-32 md:pt-14">
       <Link
         href="/tasks"
-        className="glass-chip inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground/70 transition hover:text-foreground hover:brightness-110"
+        className="glass-chip inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground/70 transition hover:text-foreground"
       >
         <span aria-hidden="true">←</span>
         Back to tasks

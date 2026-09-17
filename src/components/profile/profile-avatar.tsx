@@ -113,13 +113,13 @@ export function ProfileAvatar({
           <img
             src={previewUrl ?? ""}
             alt=""
-            className="h-full w-full object-cover transition-[filter] duration-200 group-hover:brightness-90 group-focus-visible:brightness-90"
+            className="h-full w-full object-cover"
             onError={() => setFailed(true)}
           />
         ) : (
           <span
             aria-hidden="true"
-            className="flex h-full w-full items-center justify-center bg-white/[0.08] font-semibold text-foreground transition-[filter] duration-200 group-hover:brightness-90 group-focus-visible:brightness-90"
+            className="flex h-full w-full items-center justify-center bg-white/[0.08] font-semibold text-foreground"
           >
             {initial}
           </span>

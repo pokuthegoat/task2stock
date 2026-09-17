@@ -44,7 +44,7 @@ export function TaskSubmitForm({
       <div>
         <p className="label">File proof</p>
         <label
-          className="glass-tile mt-3 flex min-h-48 cursor-pointer flex-col items-center justify-center border-dashed border-white/18 px-5 py-10 text-center transition hover:border-white/28 hover:brightness-110"
+          className="glass-tile mt-3 flex min-h-48 cursor-pointer flex-col items-center justify-center border-dashed border-white/18 px-5 py-10 text-center transition hover:border-white/28"
           onDragOver={(event) => {
             event.preventDefault();
           }}

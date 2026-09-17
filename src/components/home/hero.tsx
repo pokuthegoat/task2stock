@@ -5,7 +5,7 @@ import { PageContainer } from "@/components/ui/page-container";
 
 export function Hero() {
   return (
-    <section className="section-hero relative flex min-h-[82svh] items-center overflow-x-clip pb-20 pt-10 md:min-h-[88svh] md:pb-28 md:pt-14">
+    <section className="section-hero relative flex min-h-[82svh] items-center overflow-hidden pb-20 pt-10 md:min-h-[88svh] md:pb-28 md:pt-14">
       <HeroVideo />
       <PageContainer className="relative z-10">
         <div className="grid items-center gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(280px,400px)] lg:gap-16">

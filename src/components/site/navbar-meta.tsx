@@ -1,5 +1,5 @@
 const pill =
-  "glass-chip inline-flex h-9 items-center justify-center text-[12px] font-medium text-foreground/78 transition hover:brightness-110 hover:text-foreground";
+  "glass-chip inline-flex h-9 items-center justify-center text-[12px] font-medium text-foreground/78 transition hover:text-foreground";
 
 export function NavbarCaButton() {
   return (

@@ -58,49 +58,20 @@ body {
   color: #fff;
 }
 
-/* Ambient light pools keep the dark UI from reading flat. The layer is pinned
-   behind page content, so it stays still while the page scrolls. */
 .ambient {
   position: relative;
   z-index: 0;
 }
 
-.ambient::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image:
-    radial-gradient(
-      760px 540px at 84% 8%,
-      rgba(239, 232, 220, 0.06),
-      transparent 68%
-    ),
-    radial-gradient(
-      700px 500px at 4% 64%,
-      rgba(183, 196, 174, 0.045),
-      transparent 68%
-    );
-}
-
-.section-base {
-  background-color: transparent;
-}
-
+.section-base,
 .section-lift {
-  background-color: transparent;
+  background-color: var(--background);
 }
 
 .section-hero {
   background-color: var(--background);
-  background-image: radial-gradient(
-    900px 420px at 50% 0%,
-    rgba(239, 232, 220, 0.1),
-    transparent 74%
-  );
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
+  background-image: none;
+  overflow: hidden;
 }
 
 .display {
@@ -141,20 +112,12 @@ body {
 .glass-panel,
 .glass-tile,
 .glass-chip {
-  /* Layered translucency: corner reflection over a vertical sheen. */
-  background-image:
-    radial-gradient(
-      120% 78% at 12% -14%,
-      rgba(255, 255, 255, 0.11),
-      transparent 58%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.095),
-      rgba(255, 255, 255, 0.04) 50%,
-      rgba(255, 255, 255, 0.06)
-    );
+  background-color: rgba(255, 255, 255, 0.06);
+  background-image: none;
   border: 1px solid var(--line);
+  box-shadow: none;
+  filter: none;
+  text-shadow: none;
 }
 
 .glass {
@@ -173,24 +136,17 @@ body {
   border-radius: var(--r-lg);
   backdrop-filter: blur(22px) saturate(145%);
   -webkit-backdrop-filter: blur(22px) saturate(145%);
-  transition:
-    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 320ms ease,
-    filter 320ms ease;
 }
 
+/* Hover lift / glow disabled sitewide. */
 .glass-tile-hover:hover {
-  transform: translateY(-3px);
-  border-color: var(--line-strong);
-  filter: brightness(1.05);
+  transform: none;
+  border-color: var(--line);
+  filter: none;
 }
 
 .pointer-glow {
-  display: none;
-}
-
-.glass-tile-hover:hover > .pointer-glow {
-  display: none;
+  display: none !important;
 }
 
 .filter-chip {
@@ -199,23 +155,14 @@ body {
 
 .filter-chip:hover {
   color: var(--foreground);
-  filter: brightness(1.08);
+  filter: none;
 }
 
 .filter-chip[aria-pressed="true"] {
   color: var(--foreground);
   border-color: var(--line-strong);
-  background-image:
-    radial-gradient(
-      120% 78% at 12% -14%,
-      rgba(255, 255, 255, 0.18),
-      transparent 58%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.16),
-      rgba(255, 255, 255, 0.07)
-    );
+  background-color: rgba(255, 255, 255, 0.1);
+  background-image: none;
 }
 
 .task-accent-edge::before {
@@ -234,34 +181,18 @@ body {
   position: relative;
   overflow: hidden;
   height: 148px;
-  background:
-    radial-gradient(
-      90% 120% at 78% 20%,
-      color-mix(in srgb, var(--task-accent) 28%, transparent),
-      transparent 58%
-    ),
-    radial-gradient(80% 90% at 8% 90%, rgba(255, 255, 255, 0.07), transparent 62%),
-    linear-gradient(180deg, rgba(16, 16, 22, 0.2), rgba(8, 8, 12, 0.55));
+  background: color-mix(in srgb, var(--task-accent) 14%, #121218);
 }
 
 .task-still-wash {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(14, 14, 19, 0.15),
-      rgba(14, 14, 19, 0.55) 78%,
-      rgba(14, 14, 19, 0.82)
-    ),
-    repeating-linear-gradient(
-      -18deg,
-      transparent,
-      transparent 18px,
-      rgba(255, 255, 255, 0.018) 18px,
-      rgba(255, 255, 255, 0.018) 19px
-    );
-  filter: saturate(0.7) brightness(0.92);
+  background: linear-gradient(
+    180deg,
+    rgba(14, 14, 19, 0.2),
+    rgba(14, 14, 19, 0.72)
+  );
+  filter: none;
 }
 
 .task-still-icon {
@@ -351,7 +282,8 @@ body {
   width: 0.7rem;
   border-radius: 999px;
   background: var(--positive);
-  box-shadow: 0 0 0 3px #0e0e13;
+  border: 3px solid #0e0e13;
+  box-shadow: none;
 }
 
 .ghost-row {
@@ -370,6 +302,7 @@ body {
   backdrop-filter: blur(34px) saturate(170%);
   -webkit-backdrop-filter: blur(34px) saturate(170%);
   border: 1px solid var(--line);
+  box-shadow: none;
 }
 
 .nav-link {
@@ -489,12 +422,11 @@ body {
 
 .story-chapter-copy {
   opacity: 0.1;
-  filter: blur(22px);
+  filter: none;
   transform: translate3d(0, 42px, 0);
   transition:
     opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1.15s cubic-bezier(0.22, 1, 0.36, 1),
-    filter 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transform 1.15s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .story-chapter.is-visible .story-chapter-copy {
@@ -524,28 +456,19 @@ body {
 .btn-glass {
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
-  background-image: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.18),
-    rgba(255, 255, 255, 0) 64%
-  );
+  background-image: none;
+  box-shadow: none;
+  filter: none;
   transition:
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 220ms ease,
-    backdrop-filter 220ms ease,
     background-color 220ms ease,
     border-color 220ms ease;
 }
 
-.btn-glass:hover {
-  transform: scale(1.02);
-  filter: brightness(1.08);
-  backdrop-filter: blur(11px) saturate(160%);
-  -webkit-backdrop-filter: blur(11px) saturate(160%);
-}
-
+.btn-glass:hover,
 .btn-glass:active {
-  transform: scale(0.99);
+  transform: none;
+  filter: none;
+  box-shadow: none;
 }
 
 /* Full-bleed hero background video; reaches up behind the floating nav. */
@@ -559,28 +482,24 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Dulled so the headline stays the focus: darker, desaturated, softened. */
-  filter: saturate(0.68) brightness(0.58) contrast(1.04) blur(0.4px);
+  /* Dulled so the headline stays the focus: darker, desaturated. */
+  filter: saturate(0.68) brightness(0.58) contrast(1.04);
   transform: scale(1.03);
 }
 
+/* Hard bottom seal into page background — no soft landscape bleed into Rewards / How it works. */
 .hero-video-scrim {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(13, 13, 16, 0.64),
-      rgba(13, 13, 16, 0.38) 34%,
-      rgba(13, 13, 16, 0.62) 78%,
-      var(--background)
-    ),
-    radial-gradient(
-      120% 90% at 18% 24%,
-      rgba(13, 13, 16, 0.08),
-      rgba(13, 13, 16, 0.5) 72%
-    );
+  background: linear-gradient(
+    180deg,
+    rgba(14, 14, 19, 0.55) 0%,
+    rgba(14, 14, 19, 0.42) 28%,
+    rgba(14, 14, 19, 0.72) 58%,
+    var(--background) 82%,
+    var(--background) 100%
+  );
 }
 
 .hero-loop-static {
@@ -951,19 +870,13 @@ body {
   .btn-glass:active {
     transform: none;
     filter: none;
-    backdrop-filter: blur(20px) saturate(150%);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
   }
 
   .glass-tile,
   .glass-tile-hover:hover {
     transform: none;
+    filter: none;
     transition: none;
-  }
-
-  .pointer-glow,
-  .glass-tile-hover:hover > .pointer-glow {
-    opacity: 0;
   }
 
   .hero-loop-live {
