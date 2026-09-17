@@ -1,14 +1,55 @@
+"use client";
+
+import { useState } from "react";
+import { shortenEvmAddress } from "@/lib/rewards/eth";
+
+const CONTRACT_ADDRESS = "0x369db3bafc0413b9fa7f6a0b057071c2b7598ef0";
+
 const pill =
   "glass-chip inline-flex h-9 items-center justify-center text-[12px] font-medium text-foreground/78 transition hover:text-foreground";
 
 export function NavbarCaButton() {
+  const [copied, setCopied] = useState(false);
+
+  async function copyCa() {
+    try {
+      await navigator.clipboard.writeText(CONTRACT_ADDRESS);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Fallback for environments where Clipboard API is blocked
+      const textarea = document.createElement("textarea");
+      textarea.value = CONTRACT_ADDRESS;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        setCopied(true);
+        window.setTimeout(() => setCopied(false), 1500);
+      } finally {
+        document.body.removeChild(textarea);
+      }
+    }
+  }
+
   return (
-    <span
-      aria-label="Contract address not applicable"
-      className={`${pill} px-3`}
+    <button
+      type="button"
+      onClick={copyCa}
+      aria-label={
+        copied
+          ? "Contract address copied"
+          : `Copy contract address ${CONTRACT_ADDRESS}`
+      }
+      title={CONTRACT_ADDRESS}
+      className={`${pill} cursor-pointer gap-1.5 px-3 font-mono`}
     >
-      ca not applicable
-    </span>
+      <span className="font-sans tracking-wide">ca</span>
+      <span>{copied ? "copied" : shortenEvmAddress(CONTRACT_ADDRESS)}</span>
+    </button>
   );
 }
 
