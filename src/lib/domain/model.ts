@@ -102,20 +102,30 @@ export type ProofSubmission = {
   videoUrl: string | null;
 };
 
-/** Status only. Do not add reviewer rules, scoring, or approval engines here. */
-export type VerificationStatus = "none" | "submitted" | "verified";
+/** Status only. Manual approve/reject goes through admin review actions. */
+export type VerificationStatus =
+  | "none"
+  | "submitted"
+  | "verified"
+  | "rejected";
 
 export type VerificationRecord = {
   submissionId: SubmissionId;
   status: VerificationStatus;
+  rejectionReason: string | null;
   updatedAt: string;
 };
 
 /**
- * Recorded grant. `issued` means the operator marked it paid/granted.
- * Real-world delivery happens outside the app. Do not add payout fields.
+ * ETH payout claim after proof verification.
+ * `claim_requested` = user asked for payout; `paid` = admin confirmed manual send.
+ * Legacy `issued` rows are treated as paid. `not_issued` is unused by the claim flow.
  */
-export type RewardStatus = "not_issued" | "issued";
+export type RewardStatus =
+  | "not_issued"
+  | "claim_requested"
+  | "paid"
+  | "issued";
 
 export type Reward = {
   id: RewardId;
@@ -124,7 +134,12 @@ export type Reward = {
   submissionId: SubmissionId | null;
   amountCents: number;
   ticker: string;
+  ethAmount: string;
   status: RewardStatus;
+  payoutWalletAddress: string | null;
+  claimedAt: string | null;
+  paidAt: string | null;
+  txHash: string | null;
 };
 
 export type Holding = {

@@ -5,10 +5,12 @@ import type {
   ProofSubmission,
   Reward,
   RewardOffer,
+  SubmissionId,
   Task,
   TaskAttempt,
   TaskCompletion,
   TaskId,
+  UserId,
   VerificationRecord,
 } from "@/lib/domain/model";
 import type { WorkStatus } from "@/lib/data/work";
@@ -78,6 +80,51 @@ export type WorkItemView = {
   status: WorkStatus;
   statusLabel: string;
   href: string;
+};
+
+/** Admin review queue row. Built from ProofSubmission + VerificationRecord + Task + User. */
+export type AdminSubmissionView = {
+  submissionId: SubmissionId;
+  userId: UserId;
+  userName: string;
+  userEmail: string | null;
+  userWalletAddress: string | null;
+  taskId: TaskId;
+  taskTitle: string;
+  rewardAmountCents: number;
+  rewardTicker: string;
+  submittedAt: string;
+  details: string;
+  file: {
+    fileName: string;
+    contentType: string;
+    size: number;
+    href: string;
+  } | null;
+  videoUrl: string | null;
+  status: Extract<
+    VerificationRecord["status"],
+    "submitted" | "verified" | "rejected"
+  >;
+  rejectionReason: string | null;
+  updatedAt: string;
+};
+
+/** Admin ETH payout queue row. Built from Reward claim + Task + User. */
+export type AdminPayoutView = {
+  rewardId: string;
+  submissionId: SubmissionId;
+  userId: UserId;
+  userName: string;
+  userEmail: string | null;
+  taskId: TaskId;
+  taskTitle: string;
+  ethAmount: string;
+  payoutWalletAddress: string | null;
+  status: "claim_requested" | "paid";
+  claimedAt: string | null;
+  paidAt: string | null;
+  txHash: string | null;
 };
 
 /** Current participation chain for one participant + task. */

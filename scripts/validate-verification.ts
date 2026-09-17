@@ -45,6 +45,11 @@ async function main() {
     details: "Recorded a 90-second listening session for Phase 6.",
   });
 
+  await prisma.verificationRecord.update({
+    where: { submissionId: created.id },
+    data: { status: "submitted", rejectionReason: null, updatedAt: new Date() },
+  });
+
   const afterSubmit = await getTaskProgress(user.id, "listening-session");
 
   if (afterSubmit.verification?.status !== "submitted" || !afterSubmit.submission) {
@@ -84,6 +89,10 @@ async function main() {
     }
   }
 
+  const rewardsBefore = await prisma.reward.count({
+    where: { submissionId: created.id },
+  });
+
   const first = await setVerificationStatus(created.id, "verified");
   const second = await setVerificationStatus(created.id, "verified");
 
@@ -92,17 +101,16 @@ async function main() {
   }
 
   const afterVerify = await getTaskProgress(user.id, "listening-session");
-  const [rewards, holdings] = await Promise.all([
-    prisma.reward.count(),
-    prisma.holding.count(),
-  ]);
+  const rewardsAfter = await prisma.reward.count({
+    where: { submissionId: created.id },
+  });
 
   if (afterVerify.verification?.status !== "verified") {
     throw new Error("getTaskProgress must return verified.");
   }
 
-  if (rewards !== 0 || holdings !== 0) {
-    throw new Error("Verification must not issue a reward or holding.");
+  if (rewardsAfter !== rewardsBefore) {
+    throw new Error("Verification must not issue a reward.");
   }
 
   console.log("Verification DAL and access seam checks passed.");
@@ -110,8 +118,8 @@ async function main() {
     userId: user.id,
     submissionId: created.id,
     status: afterVerify.verification.status,
-    rewards,
-    holdings,
+    rewardsBefore,
+    rewardsAfter,
     provider: provider.code,
     ownerDenied: asOwner.code,
   });

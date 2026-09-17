@@ -7,7 +7,7 @@ import { TaskProgressRail } from "@/components/tasks/task-progress-rail";
 import { TaskSubmitForm } from "@/components/tasks/task-submit-form";
 import { TaskSubmitStatus } from "@/components/tasks/task-submit-status";
 import { PageContainer } from "@/components/ui/page-container";
-import { formatRewardOffer, formatUsdCompact, type TaskView } from "@/lib/data";
+import { formatRewardOffer, formatUsdCompact, workStatusLabels, type TaskView, type WorkStatus } from "@/lib/data";
 import { useAuth } from "@/components/auth/auth-provider";
 import {
   getProofInputError,
@@ -15,6 +15,7 @@ import {
 } from "@/lib/proof/input";
 import { isAllowedProofFileName, PROOF_MAX_BYTES } from "@/lib/proof/types";
 import { uploadProofBlob } from "@/lib/storage/client-upload";
+import { formatEthReward } from "@/lib/rewards/eth";
 
 export function TaskSubmit({
   task,
@@ -23,6 +24,12 @@ export function TaskSubmit({
   initialFile,
   submittedAt,
   submitted: initialSubmitted,
+  reviewStatus,
+  rejectionReason,
+  submissionId,
+  ethAmount,
+  payoutWalletAddress,
+  txHash,
 }: {
   task: TaskView;
   initialDetails: string;
@@ -30,6 +37,12 @@ export function TaskSubmit({
   initialFile?: { fileName: string; size: number; href: string } | null;
   submittedAt?: string | null;
   submitted: boolean;
+  reviewStatus: WorkStatus;
+  rejectionReason?: string | null;
+  submissionId?: string | null;
+  ethAmount: string;
+  payoutWalletAddress?: string | null;
+  txHash?: string | null;
 }) {
   const { user } = useAuth();
   const [details, setDetails] = useState(initialDetails);
@@ -127,6 +140,18 @@ export function TaskSubmit({
     }
   }
 
+  const statusLabel = submitted
+    ? workStatusLabels[reviewStatus]
+    : "Not submitted";
+  const headline = submitted ? statusLabel : "Submit proof";
+  const lead = submitted
+    ? reviewStatus === "verified"
+      ? "Your proof was approved."
+      : reviewStatus === "rejected"
+        ? "Your proof was rejected."
+        : "Your submission has been sent for review."
+    : task.requirement;
+
   return (
     <PageContainer className="pb-24 pt-10 md:pb-32 md:pt-14">
       <Link
@@ -146,7 +171,7 @@ export function TaskSubmit({
           <p className="label">{task.company.name}</p>
 
           <h1 className="display mt-4 text-4xl text-foreground md:text-5xl">
-            {submitted ? "Payout pending" : "Submit proof"}
+            {headline}
           </h1>
 
           <p className="mt-5 font-mono text-lg tracking-tight text-accent">
@@ -154,22 +179,26 @@ export function TaskSubmit({
           </p>
 
           <p className="mt-6 max-w-xl text-lg font-normal leading-8 text-foreground/72">
-            {submitted
-              ? "Your submission has been sent for review."
-              : task.requirement}
+            {lead}
           </p>
 
           <hr className="hairline my-9" />
 
-          {submitted ? (
+          {submitted && submissionId ? (
             <div>
               <TaskSubmitStatus
                 taskTitle={task.title}
                 reward={task.reward}
+                ethAmount={ethAmount}
                 submittedAt={savedAt}
                 details={details.trim()}
                 videoUrl={videoUrl.trim() || null}
                 file={existingFile}
+                reviewStatus={reviewStatus}
+                rejectionReason={rejectionReason}
+                submissionId={submissionId}
+                payoutWalletAddress={payoutWalletAddress}
+                txHash={txHash}
               />
             </div>
           ) : (
@@ -230,18 +259,26 @@ export function TaskSubmit({
               <div className="flex justify-between gap-4">
                 <dt className="text-foreground/55">Status</dt>
                 <dd className="text-right font-medium text-foreground/88">
-                  {submitted ? "Payout pending" : "Not submitted"}
+                  {statusLabel}
                 </dd>
               </div>
               <div className="flex justify-between gap-4">
                 <dt className="text-foreground/55">Reward</dt>
                 <dd className="text-right font-medium text-foreground/88">
-                  Not issued
+                  {reviewStatus === "reward_paid"
+                    ? "Paid"
+                    : reviewStatus === "claim_requested"
+                      ? "Claim requested"
+                      : formatEthReward(ethAmount)}
                 </dd>
               </div>
             </dl>
             <p className="mt-7 text-center text-xs leading-5 text-foreground/55">
-              Proof stays pending until review.
+              {reviewStatus === "rejected"
+                ? "Rejected proofs cannot be claimed."
+                : reviewStatus === "reward_paid"
+                  ? "This reward has been paid."
+                  : "ETH payouts are sent manually after you claim."}
             </p>
           </div>
         </aside>

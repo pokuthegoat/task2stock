@@ -454,13 +454,33 @@ export const portfolioHoldings: Holding[] = [
   },
 ];
 
+function fixtureReward(
+  reward: Omit<
+    Reward,
+    | "ethAmount"
+    | "payoutWalletAddress"
+    | "claimedAt"
+    | "paidAt"
+    | "txHash"
+  >,
+): Reward {
+  return {
+    ...reward,
+    ethAmount: "0.01",
+    payoutWalletAddress: null,
+    claimedAt: null,
+    paidAt: null,
+    txHash: null,
+  };
+}
+
 export const taskEarningFixtures: Array<{
   reward: Reward;
   completedLabel: string;
   statusLabel: string;
 }> = [
   {
-    reward: {
+    reward: fixtureReward({
       id: "reward-product-video",
       userId: EXAMPLE_PORTFOLIO_USER_ID,
       taskId: "product-video",
@@ -468,12 +488,12 @@ export const taskEarningFixtures: Array<{
       amountCents: 2500,
       ticker: "AAPL",
       status: "not_issued",
-    },
+    }),
     completedLabel: "Mar 12",
     statusLabel: "Reward",
   },
   {
-    reward: {
+    reward: fixtureReward({
       id: "reward-listening-session",
       userId: EXAMPLE_PORTFOLIO_USER_ID,
       taskId: "listening-session",
@@ -481,12 +501,12 @@ export const taskEarningFixtures: Array<{
       amountCents: 1800,
       ticker: "AAPL",
       status: "not_issued",
-    },
+    }),
     completedLabel: "Mar 8",
     statusLabel: "Reward",
   },
   {
-    reward: {
+    reward: fixtureReward({
       id: "reward-run-20km",
       userId: EXAMPLE_PORTFOLIO_USER_ID,
       taskId: "run-20km",
@@ -494,12 +514,12 @@ export const taskEarningFixtures: Array<{
       amountCents: 1500,
       ticker: "NVDA",
       status: "not_issued",
-    },
+    }),
     completedLabel: "Mar 4",
     statusLabel: "Reward",
   },
   {
-    reward: {
+    reward: fixtureReward({
       id: "reward-trail-loop",
       userId: EXAMPLE_PORTFOLIO_USER_ID,
       taskId: "trail-loop",
@@ -507,12 +527,12 @@ export const taskEarningFixtures: Array<{
       amountCents: 2000,
       ticker: "NVDA",
       status: "not_issued",
-    },
+    }),
     completedLabel: "Feb 28",
     statusLabel: "Reward",
   },
   {
-    reward: {
+    reward: fixtureReward({
       id: "reward-community-campaign",
       userId: EXAMPLE_PORTFOLIO_USER_ID,
       taskId: "community-campaign",
@@ -520,12 +540,12 @@ export const taskEarningFixtures: Array<{
       amountCents: 1000,
       ticker: "COIN",
       status: "not_issued",
-    },
+    }),
     completedLabel: "Feb 21",
     statusLabel: "Reward",
   },
   {
-    reward: {
+    reward: fixtureReward({
       id: "reward-civic-workshop",
       userId: EXAMPLE_PORTFOLIO_USER_ID,
       taskId: "civic-workshop",
@@ -533,7 +553,7 @@ export const taskEarningFixtures: Array<{
       amountCents: 3000,
       ticker: "GOOGL",
       status: "not_issued",
-    },
+    }),
     completedLabel: "Feb 14",
     statusLabel: "Reward",
   },

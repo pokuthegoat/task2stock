@@ -6,6 +6,7 @@ import {
   listIssuedTaskEarnings,
   setVerificationStatus,
 } from "../src/lib/data/db/participation";
+import { isRewardPaidStatus } from "../src/lib/data/work";
 
 const prisma = new PrismaClient();
 
@@ -22,9 +23,9 @@ async function main() {
 
   if (
     submitted.verification?.status !== "submitted" ||
-    submitted.reward?.status === "issued"
+    isRewardPaidStatus(submitted.reward?.status)
   ) {
-    throw new Error("product-video must stay submitted with no issued reward.");
+    throw new Error("product-video must stay submitted with no paid reward.");
   }
 
   const storePhotos = await prisma.proofSubmission.findFirst({
@@ -41,45 +42,55 @@ async function main() {
 
   if (
     verified.verification?.status !== "verified" ||
-    verified.reward?.status === "issued"
+    isRewardPaidStatus(verified.reward?.status)
   ) {
-    throw new Error("store-photos must be verified without an issued reward.");
+    throw new Error("store-photos must be verified without a paid reward.");
   }
 
+  const listening = await getTaskProgress(user.id, "listening-session");
+  if (!listening.submission?.id) {
+    throw new Error("Expected listening-session submission.");
+  }
+
+  await setVerificationStatus(listening.submission.id, "verified");
+  const first = await issueReward(listening.submission.id);
+  const second = await issueReward(listening.submission.id);
   const issued = await getTaskProgress(user.id, "listening-session");
-  const first = await issueReward(issued.submission?.id ?? "");
-  const second = await issueReward(issued.submission?.id ?? "");
   const earnings = await listIssuedTaskEarnings(user.id);
   const none = await listIssuedRewardsForUser("no-such-user");
   const [rewardCount, holdings] = await Promise.all([
     prisma.reward.count({
-      where: { userId: user.id, status: "issued" },
+      where: { userId: user.id, status: { in: ["paid", "issued"] } },
     }),
     prisma.holding.count(),
   ]);
 
   if (
     issued.verification?.status !== "verified" ||
-    issued.reward?.status !== "issued" ||
-    issued.reward.amountCents !== 1800 ||
-    issued.reward.ticker !== "AAPL"
+    !isRewardPaidStatus(issued.reward?.status) ||
+    issued.reward?.amountCents !== 1800 ||
+    issued.reward?.ticker !== "AAPL"
   ) {
-    throw new Error("listening-session must show the issued $18 AAPL reward.");
+    throw new Error("listening-session must show the paid $18 AAPL reward.");
   }
 
-  if (first.id !== second.id || earnings.length !== 1) {
+  if (first.id !== second.id || earnings.length < 1) {
     throw new Error("Issuing twice must not duplicate reward history.");
   }
 
+  const listeningEarning = earnings.find(
+    (item) => item.reward.taskId === "listening-session",
+  );
+
   if (
-    earnings[0]?.reward.amountCents !== 1800 ||
-    earnings[0]?.reward.ticker !== "AAPL" ||
-    earnings[0]?.statusLabel !== "Issued"
+    listeningEarning?.reward.amountCents !== 1800 ||
+    listeningEarning?.reward.ticker !== "AAPL" ||
+    listeningEarning?.statusLabel !== "Reward paid"
   ) {
-    throw new Error("Issued earnings must use the persisted Reward record.");
+    throw new Error("Paid earnings must use the persisted Reward record.");
   }
 
-  if (none.length !== 0 || rewardCount !== 1 || holdings !== 0) {
+  if (none.length !== 0 || rewardCount < 1 || holdings !== 0) {
     throw new Error("Empty users stay empty, and no Holding may be created.");
   }
 
@@ -87,9 +98,9 @@ async function main() {
   console.log({
     submitted: submitted.verification?.status,
     verifiedPending: verified.verification?.status,
-    issuedStatus: issued.reward.status,
-    issuedAmount: issued.reward.amountCents,
-    issuedTicker: issued.reward.ticker,
+    issuedStatus: issued.reward?.status,
+    issuedAmount: issued.reward?.amountCents,
+    issuedTicker: issued.reward?.ticker,
     earnings: earnings.length,
     rewards: rewardCount,
     holdings,

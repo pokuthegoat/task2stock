@@ -69,6 +69,7 @@ type SubmissionRow = {
 type VerificationRow = {
   submissionId: string;
   status: string;
+  rejectionReason?: string | null;
   updatedAt: Date;
 };
 type RewardRow = {
@@ -78,7 +79,12 @@ type RewardRow = {
   submissionId: string | null;
   amountCents: number;
   ticker: string;
+  ethAmount?: string | null;
   status: string;
+  payoutWalletAddress?: string | null;
+  claimedAt?: Date | null;
+  paidAt?: Date | null;
+  txHash?: string | null;
 };
 type HoldingRow = {
   id: string;
@@ -146,7 +152,12 @@ function asAttemptStatus(value: string): TaskAttempt["status"] {
 }
 
 function asVerificationStatus(value: string): VerificationStatus {
-  if (value === "none" || value === "submitted" || value === "verified") {
+  if (
+    value === "none" ||
+    value === "submitted" ||
+    value === "verified" ||
+    value === "rejected"
+  ) {
     return value;
   }
 
@@ -154,7 +165,12 @@ function asVerificationStatus(value: string): VerificationStatus {
 }
 
 function asRewardStatus(value: string): RewardStatus {
-  if (value === "not_issued" || value === "issued") {
+  if (
+    value === "not_issued" ||
+    value === "claim_requested" ||
+    value === "paid" ||
+    value === "issued"
+  ) {
     return value;
   }
 
@@ -294,6 +310,7 @@ export function toVerification(row: VerificationRow): VerificationRecord {
   return {
     submissionId: row.submissionId,
     status: asVerificationStatus(row.status),
+    rejectionReason: row.rejectionReason?.trim() || null,
     updatedAt: row.updatedAt.toISOString(),
   };
 }
@@ -306,7 +323,12 @@ export function toReward(row: RewardRow): Reward {
     submissionId: row.submissionId,
     amountCents: row.amountCents,
     ticker: row.ticker,
+    ethAmount: row.ethAmount?.trim() || "0.01",
     status: asRewardStatus(row.status),
+    payoutWalletAddress: row.payoutWalletAddress?.trim() || null,
+    claimedAt: row.claimedAt ? row.claimedAt.toISOString() : null,
+    paidAt: row.paidAt ? row.paidAt.toISOString() : null,
+    txHash: row.txHash?.trim() || null,
   };
 }
 

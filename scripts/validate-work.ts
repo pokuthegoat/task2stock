@@ -19,6 +19,7 @@ const submission: ProofSubmission = {
 const submitted: VerificationRecord = {
   submissionId: "sub-1",
   status: "submitted",
+  rejectionReason: null,
   updatedAt: "2026-09-13T00:00:00.000Z",
 };
 
@@ -27,14 +28,32 @@ const verified: VerificationRecord = {
   status: "verified",
 };
 
-const issued: Reward = {
+const rejected: VerificationRecord = {
+  ...submitted,
+  status: "rejected",
+  rejectionReason: "Photo does not show distance.",
+};
+
+const claimed: Reward = {
   id: "rwd-1",
   userId: "user-1",
   taskId: "run-20km",
   submissionId: "sub-1",
   amountCents: 1500,
   ticker: "NVDA",
-  status: "issued",
+  ethAmount: "0.01",
+  status: "claim_requested",
+  payoutWalletAddress: "0x65b4aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1e39aa",
+  claimedAt: "2026-09-17T00:00:00.000Z",
+  paidAt: null,
+  txHash: null,
+};
+
+const paid: Reward = {
+  ...claimed,
+  status: "paid",
+  paidAt: "2026-09-17T12:00:00.000Z",
+  txHash: "0xabc",
 };
 
 function expectStatus(
@@ -69,7 +88,7 @@ function main() {
   );
 
   expectStatus(
-    "verified pending reward",
+    "verified pending claim",
     deriveWorkStatus({
       submission,
       verification: verified,
@@ -79,30 +98,46 @@ function main() {
   );
 
   expectStatus(
-    "reward issued",
+    "rejected proof",
+    deriveWorkStatus({
+      submission,
+      verification: rejected,
+      reward: null,
+    }),
+    "rejected",
+  );
+
+  expectStatus(
+    "claim requested",
     deriveWorkStatus({
       submission,
       verification: verified,
-      reward: issued,
+      reward: claimed,
     }),
-    "reward_issued",
+    "claim_requested",
+  );
+
+  expectStatus(
+    "reward paid",
+    deriveWorkStatus({
+      submission,
+      verification: verified,
+      reward: paid,
+    }),
+    "reward_paid",
   );
 
   if (workHref("run-20km") !== "/tasks/run-20km/submit") {
     throw new Error("In progress must link to the submit page.");
   }
 
-  for (const status of ["proof_submitted", "verified", "reward_issued"] as const) {
-    if (workHref("run-20km") !== "/tasks/run-20km/submit") {
-      throw new Error(`${status} must link to the submit page.`);
-    }
-  }
-
   if (
     workStatusLabels.in_progress !== "In progress" ||
-    workStatusLabels.proof_submitted !== "Payout pending" ||
-    workStatusLabels.verified !== "Verified" ||
-    workStatusLabels.reward_issued !== "Reward issued"
+    workStatusLabels.proof_submitted !== "Awaiting review" ||
+    workStatusLabels.verified !== "Reward approved" ||
+    workStatusLabels.rejected !== "Proof rejected" ||
+    workStatusLabels.claim_requested !== "Claim requested" ||
+    workStatusLabels.reward_paid !== "Reward paid"
   ) {
     throw new Error("Unexpected work status labels.");
   }

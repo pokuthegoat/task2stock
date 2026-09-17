@@ -5,7 +5,9 @@ import { PROFILE_SETUP_PATH } from "@/lib/auth/profile-gate";
 import { getSession } from "@/lib/auth/session";
 import { getTaskById, listTasks } from "@/lib/data/catalog";
 import { logDatabaseError } from "@/lib/data/db/errors";
+import { deriveWorkStatus } from "@/lib/data/work";
 import { getTaskProgress, startTaskAttempt } from "@/lib/data/participation";
+import { getEthRewardAmount } from "@/lib/rewards/eth";
 
 export const dynamic = "force-dynamic";
 
@@ -65,6 +67,8 @@ export default async function TaskSubmitPage({
 
   const progress = await getTaskProgress(session.user.id, task.id);
   const submitted = Boolean(progress.submission);
+  const reviewStatus = deriveWorkStatus(progress);
+  const ethAmount = progress.reward?.ethAmount ?? getEthRewardAmount();
 
   return (
     <main id="main" className="section-base flex-1">
@@ -83,6 +87,12 @@ export default async function TaskSubmitPage({
         }
         submittedAt={progress.submission?.submittedAt ?? null}
         submitted={submitted}
+        reviewStatus={reviewStatus}
+        rejectionReason={progress.verification?.rejectionReason ?? null}
+        submissionId={progress.submission?.id ?? null}
+        ethAmount={ethAmount}
+        payoutWalletAddress={progress.reward?.payoutWalletAddress ?? null}
+        txHash={progress.reward?.txHash ?? null}
       />
     </main>
   );

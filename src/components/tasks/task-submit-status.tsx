@@ -1,20 +1,35 @@
+import { ClaimRewardForm } from "@/components/tasks/claim-reward-form";
 import { Button } from "@/components/ui/button";
-import { formatRewardOffer, formatUsdCompact } from "@/lib/data";
+import { formatRewardOffer, formatUsdCompact, workStatusLabels } from "@/lib/data";
+import type { WorkStatus } from "@/lib/data";
+import { formatEthReward } from "@/lib/rewards/eth";
 
 export function TaskSubmitStatus({
   taskTitle,
   reward,
+  ethAmount,
   submittedAt,
   details,
   videoUrl,
   file,
+  reviewStatus,
+  rejectionReason,
+  submissionId,
+  payoutWalletAddress,
+  txHash,
 }: {
   taskTitle: string;
   reward: { amountCents: number; ticker: string };
+  ethAmount: string;
   submittedAt?: string | null;
   details: string;
   videoUrl?: string | null;
   file?: { fileName: string; size: number; href: string } | null;
+  reviewStatus: WorkStatus;
+  rejectionReason?: string | null;
+  submissionId: string;
+  payoutWalletAddress?: string | null;
+  txHash?: string | null;
 }) {
   const submittedLabel = submittedAt
     ? new Date(submittedAt).toLocaleDateString("en-US", {
@@ -24,12 +39,21 @@ export function TaskSubmitStatus({
       })
     : null;
 
+  const statusLabel = workStatusLabels[reviewStatus];
+  const statusCopy =
+    reviewStatus === "verified"
+      ? "Your proof was approved. Enter a payout wallet and claim your ETH reward."
+      : reviewStatus === "claim_requested"
+        ? "Claim requested. Task2Stock will pay manually from the treasury wallet."
+        : reviewStatus === "reward_paid"
+          ? "Reward paid. This claim is complete."
+          : reviewStatus === "rejected"
+            ? "Your proof was rejected. This submission cannot be claimed."
+            : "Proof stays pending until review.";
+
   return (
     <div>
-      <p className="max-w-lg text-sm leading-6 text-foreground/68">
-        Proof stays pending until review. If approved, the stock reward is
-        issued after that.
-      </p>
+      <p className="max-w-lg text-sm leading-6 text-foreground/68">{statusCopy}</p>
 
       <dl className="glass-tile mt-7 space-y-4 p-6 text-sm">
         <div className="flex justify-between gap-4">
@@ -37,9 +61,15 @@ export function TaskSubmitStatus({
           <dd className="text-right text-foreground/82">{taskTitle}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt className="text-foreground/42">Reward</dt>
+          <dt className="text-foreground/42">Catalog reward</dt>
           <dd className="text-right font-mono text-foreground/82">
             {formatRewardOffer(reward)}
+          </dd>
+        </div>
+        <div className="flex justify-between gap-4">
+          <dt className="text-foreground/42">ETH payout</dt>
+          <dd className="text-right font-mono text-foreground/82">
+            {formatEthReward(ethAmount)}
           </dd>
         </div>
         {submittedLabel ? (
@@ -50,8 +80,32 @@ export function TaskSubmitStatus({
         ) : null}
         <div className="flex justify-between gap-4">
           <dt className="text-foreground/42">Status</dt>
-          <dd className="text-right text-foreground/82">Payout pending</dd>
+          <dd className="text-right text-foreground/82">{statusLabel}</dd>
         </div>
+        {reviewStatus === "rejected" && rejectionReason ? (
+          <div className="flex justify-between gap-4">
+            <dt className="text-foreground/42">Reason</dt>
+            <dd className="max-w-[16rem] text-right text-[#d4b4ae]">
+              {rejectionReason}
+            </dd>
+          </div>
+        ) : null}
+        {payoutWalletAddress ? (
+          <div className="flex justify-between gap-4">
+            <dt className="text-foreground/42">Payout wallet</dt>
+            <dd className="max-w-[16rem] break-all text-right font-mono text-xs text-foreground/70">
+              {payoutWalletAddress}
+            </dd>
+          </div>
+        ) : null}
+        {txHash ? (
+          <div className="flex justify-between gap-4">
+            <dt className="text-foreground/42">Tx hash</dt>
+            <dd className="max-w-[16rem] break-all text-right font-mono text-xs text-foreground/70">
+              {txHash}
+            </dd>
+          </div>
+        ) : null}
       </dl>
 
       {details ? (
@@ -96,9 +150,16 @@ export function TaskSubmitStatus({
         </div>
       ) : null}
 
+      {reviewStatus === "verified" ? (
+        <ClaimRewardForm submissionId={submissionId} ethAmount={ethAmount} />
+      ) : null}
+
       <p className="mt-7 max-w-lg text-xs leading-5 text-foreground/40">
-        {formatUsdCompact(reward.amountCents)} {reward.ticker} is not issued
-        yet. Portfolio is unchanged.
+        {reviewStatus === "reward_paid"
+          ? `${formatEthReward(ethAmount)} marked paid. Portfolio catalog figures are unchanged.`
+          : reviewStatus === "claim_requested"
+            ? `${formatEthReward(ethAmount)} claim is waiting on a manual treasury payout.`
+            : `${formatUsdCompact(reward.amountCents)} ${reward.ticker} catalog reward · payout is ${formatEthReward(ethAmount)}.`}
       </p>
       <div className="mt-8">
         <Button href="/work" size="lg">

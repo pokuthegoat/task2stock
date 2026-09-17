@@ -1,10 +1,7 @@
 import "server-only";
 
 import { getSession } from "@/lib/auth/session";
-import {
-  canRecordManualVerification,
-  isVerificationAdmin,
-} from "@/lib/verification/decision";
+import { isVerificationAdmin } from "@/lib/verification/decision";
 
 export {
   canIssueManualReward,

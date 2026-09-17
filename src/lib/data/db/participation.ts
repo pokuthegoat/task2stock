@@ -17,9 +17,16 @@ import {
   toTask,
   toVerification,
 } from "@/lib/data/db/mappers";
-import type { TaskEarningView, TaskProgress, WorkItemView } from "@/lib/data/types";
+import type {
+  AdminPayoutView,
+  AdminSubmissionView,
+  TaskEarningView,
+  TaskProgress,
+  WorkItemView,
+} from "@/lib/data/types";
 import {
   deriveWorkStatus,
+  isRewardPaidStatus,
   workHref,
   workStatusLabels,
 } from "@/lib/data/work";
@@ -33,6 +40,11 @@ import type {
   UserId,
   VerificationRecord,
 } from "@/lib/domain/model";
+import {
+  getEthRewardAmount,
+  isValidEvmAddress,
+  normalizeEvmAddress,
+} from "@/lib/rewards/eth";
 
 const attemptInclude = {
   completion: {
@@ -392,15 +404,16 @@ export async function getProofSubmissionById(
 }
 
 /**
- * Records submitted → verified only.
- * Does not create a VerificationRecord, Reward, or Holding.
+ * Records submitted → verified or submitted → rejected.
+ * Idempotent for the same terminal status. Does not create a Reward or Holding.
  */
 export async function setVerificationStatus(
   submissionId: SubmissionId,
-  status: "verified",
+  status: "verified" | "rejected",
+  options?: { rejectionReason?: string | null },
 ): Promise<VerificationRecord> {
-  if (status !== "verified") {
-    throw new Error("Only submitted → verified is allowed");
+  if (status !== "verified" && status !== "rejected") {
+    throw new Error("Only submitted → verified|rejected is allowed");
   }
 
   const existing = await getPrisma().verificationRecord.findUnique({
@@ -411,20 +424,40 @@ export async function setVerificationStatus(
     throw new Error(`No verification record for submission ${submissionId}`);
   }
 
-  if (existing.status === "verified") {
+  if (existing.status === status) {
+    if (status === "rejected") {
+      const nextReason = options?.rejectionReason?.trim() || null;
+      const currentReason = existing.rejectionReason?.trim() || null;
+
+      if (nextReason && nextReason !== currentReason) {
+        const updated = await getPrisma().verificationRecord.update({
+          where: { submissionId },
+          data: {
+            rejectionReason: nextReason,
+            updatedAt: new Date(),
+          },
+        });
+        return toVerification(updated);
+      }
+    }
+
     return toVerification(existing);
   }
 
   if (existing.status !== "submitted") {
     throw new Error(
-      `Cannot set verified from status ${existing.status} on ${submissionId}`,
+      `Cannot set ${status} from status ${existing.status} on ${submissionId}`,
     );
   }
 
   const updated = await getPrisma().verificationRecord.update({
     where: { submissionId },
     data: {
-      status: "verified",
+      status,
+      rejectionReason:
+        status === "rejected"
+          ? options?.rejectionReason?.trim() || null
+          : null,
       updatedAt: new Date(),
     },
   });
@@ -435,7 +468,7 @@ export async function setVerificationStatus(
 export async function getRewardForSubmission(
   submissionId: SubmissionId,
 ): Promise<Reward | undefined> {
-  const row = await getPrisma().reward.findFirst({
+  const row = await getPrisma().reward.findUnique({
     where: { submissionId },
   });
 
@@ -443,18 +476,19 @@ export async function getRewardForSubmission(
 }
 
 /**
- * Marks a verified submission's promised RewardOffer as issued.
- * Idempotent. Does not create a Holding or move money.
+ * Legacy operator path: marks a verified submission's reward as paid.
+ * Prefer claimReward + markRewardPaid for the ETH payout flow.
+ * Idempotent. Does not create a Holding or send ETH.
  */
 export async function issueReward(submissionId: SubmissionId): Promise<Reward> {
   const existing = await getRewardForSubmission(submissionId);
 
   if (existing) {
-    if (existing.status === "issued") {
+    if (isRewardPaidStatus(existing.status)) {
       return existing;
     }
 
-    if (existing.status !== "not_issued") {
+    if (existing.status !== "claim_requested" && existing.status !== "not_issued") {
       throw new Error(
         `Cannot issue reward from status ${existing.status} on ${submissionId}`,
       );
@@ -462,7 +496,10 @@ export async function issueReward(submissionId: SubmissionId): Promise<Reward> {
 
     const updated = await getPrisma().reward.update({
       where: { id: existing.id },
-      data: { status: "issued" },
+      data: {
+        status: "paid",
+        paidAt: new Date(),
+      },
     });
 
     return toReward(updated);
@@ -501,6 +538,7 @@ export async function issueReward(submissionId: SubmissionId): Promise<Reward> {
     throw new Error(`No reward offer for task ${submission.taskId}`);
   }
 
+  const now = new Date();
   const created = await getPrisma().reward.create({
     data: {
       id: crypto.randomUUID(),
@@ -509,11 +547,137 @@ export async function issueReward(submissionId: SubmissionId): Promise<Reward> {
       submissionId: submission.id,
       amountCents: offer.amountCents,
       ticker: offer.ticker,
-      status: "issued",
+      ethAmount: getEthRewardAmount(),
+      status: "paid",
+      paidAt: now,
     },
   });
 
   return toReward(created);
+}
+
+/**
+ * User claim: creates exactly one claim_requested reward for a verified submission.
+ * Requires an explicit EVM payout wallet. Does not send ETH.
+ */
+export async function claimReward(input: {
+  userId: UserId;
+  submissionId: SubmissionId;
+  payoutWalletAddress: string;
+}): Promise<Reward> {
+  const wallet = normalizeEvmAddress(input.payoutWalletAddress);
+
+  if (!isValidEvmAddress(wallet)) {
+    throw new Error("Enter a valid EVM payout wallet address.");
+  }
+
+  const existing = await getRewardForSubmission(input.submissionId);
+
+  if (existing) {
+    if (existing.userId !== input.userId) {
+      throw new Error("Not allowed to claim this reward.");
+    }
+
+    if (isRewardPaidStatus(existing.status) || existing.status === "claim_requested") {
+      return existing;
+    }
+
+    throw new Error(
+      `Cannot claim reward from status ${existing.status} on ${input.submissionId}`,
+    );
+  }
+
+  const submission = await getPrisma().proofSubmission.findUnique({
+    where: { id: input.submissionId },
+    include: { verification: true },
+  });
+
+  if (!submission) {
+    throw new Error(`No proof submission ${input.submissionId}`);
+  }
+
+  if (submission.userId !== input.userId) {
+    throw new Error("Not allowed to claim this reward.");
+  }
+
+  if (submission.verification?.status !== "verified") {
+    throw new Error("Proof must be approved before claiming a reward.");
+  }
+
+  const offer = await getPrisma().rewardOffer.findUnique({
+    where: { taskId: submission.taskId },
+  });
+
+  if (!offer) {
+    throw new Error(`No reward offer for task ${submission.taskId}`);
+  }
+
+  const now = new Date();
+
+  try {
+    const created = await getPrisma().reward.create({
+      data: {
+        id: crypto.randomUUID(),
+        userId: submission.userId,
+        taskId: submission.taskId,
+        submissionId: submission.id,
+        amountCents: offer.amountCents,
+        ticker: offer.ticker,
+        ethAmount: getEthRewardAmount(),
+        status: "claim_requested",
+        payoutWalletAddress: wallet,
+        claimedAt: now,
+      },
+    });
+
+    return toReward(created);
+  } catch (error) {
+    if (isDuplicateConstraintError(error)) {
+      const raced = await getRewardForSubmission(input.submissionId);
+      if (raced && raced.userId === input.userId) {
+        return raced;
+      }
+    }
+
+    throw error;
+  }
+}
+
+/**
+ * Admin confirms a manual ETH send. claim_requested → paid only.
+ */
+export async function markRewardPaid(input: {
+  rewardId: string;
+  txHash?: string | null;
+}): Promise<Reward> {
+  const existing = await getPrisma().reward.findUnique({
+    where: { id: input.rewardId },
+  });
+
+  if (!existing) {
+    throw new Error(`No reward ${input.rewardId}`);
+  }
+
+  if (isRewardPaidStatus(existing.status as Reward["status"])) {
+    return toReward(existing);
+  }
+
+  if (existing.status !== "claim_requested") {
+    throw new Error(
+      `Cannot mark paid from status ${existing.status} on ${input.rewardId}`,
+    );
+  }
+
+  const updated = await getPrisma().reward.update({
+    where: { id: input.rewardId },
+    data: {
+      status: "paid",
+      paidAt: new Date(),
+      txHash: input.txHash?.trim() || null,
+    },
+  });
+
+  return toReward(updated);
 }
 
 export async function getTaskProgress(
@@ -532,7 +696,7 @@ export async function listIssuedRewardsForUser(
   userId: UserId,
 ): Promise<Reward[]> {
   const rows = await getPrisma().reward.findMany({
-    where: { userId, status: "issued" },
+    where: { userId, status: { in: ["paid", "issued"] } },
     include: { submission: true },
     orderBy: { submission: { submittedAt: "desc" } },
   });
@@ -544,7 +708,7 @@ export async function listIssuedTaskEarnings(
   userId: UserId,
 ): Promise<TaskEarningView[]> {
   const rows = await getPrisma().reward.findMany({
-    where: { userId, status: "issued" },
+    where: { userId, status: { in: ["paid", "issued"] } },
     include: {
       task: { include: { company: true } },
       submission: true,
@@ -561,8 +725,8 @@ export async function listIssuedTaskEarnings(
           month: "short",
           day: "numeric",
         })
-      : "Issued",
-    statusLabel: "Issued",
+      : "Paid",
+    statusLabel: "Reward paid",
   }));
 }
 
@@ -604,5 +768,175 @@ export async function listWorkForUser(userId: UserId): Promise<WorkItemView[]> {
         statusLabel: workStatusLabels[status],
         href: workHref(task.id),
       };
+    });
+}
+
+const reviewStatusRank: Record<string, number> = {
+  submitted: 0,
+  verified: 1,
+  rejected: 2,
+};
+
+/**
+ * All proof submissions for the admin review queue.
+ * Pending (`submitted`) rows sort first, then newest submission first.
+ */
+export async function listSubmissionsForAdminReview(): Promise<
+  AdminSubmissionView[]
+> {
+  const rows = await getPrisma().proofSubmission.findMany({
+    include: {
+      verification: true,
+      task: {
+        include: {
+          rewardOffer: true,
+        },
+      },
+    },
+    orderBy: { submittedAt: "desc" },
+  });
+
+  const userIds = [...new Set(rows.map((row) => row.userId))];
+  const users = userIds.length
+    ? await getPrisma().user.findMany({
+        where: { id: { in: userIds } },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          walletAddress: true,
+        },
+      })
+    : [];
+  const usersById = new Map(users.map((user) => [user.id, user]));
+
+  return rows
+    .filter((row) => row.verification && row.verification.status !== "none")
+    .map((row) => {
+      const verification = row.verification!;
+      const status = verification.status;
+
+      if (
+        status !== "submitted" &&
+        status !== "verified" &&
+        status !== "rejected"
+      ) {
+        throw new Error(
+          `Unexpected verification status ${status} on ${row.id}`,
+        );
+      }
+
+      const reviewStatus: AdminSubmissionView["status"] = status;
+
+      if (!row.task.rewardOffer) {
+        throw new Error(`Task ${row.taskId} is missing a reward offer`);
+      }
+
+      const user = usersById.get(row.userId);
+      const submission = toSubmission(row);
+
+      return {
+        submissionId: row.id,
+        userId: row.userId,
+        userName: user?.name?.trim() || "Unknown user",
+        userEmail: user?.email ?? null,
+        userWalletAddress: user?.walletAddress ?? null,
+        taskId: row.taskId,
+        taskTitle: row.task.title,
+        rewardAmountCents: row.task.rewardOffer.amountCents,
+        rewardTicker: row.task.rewardOffer.ticker,
+        submittedAt: row.submittedAt.toISOString(),
+        details: row.details,
+        file: submission.file
+          ? {
+              fileName: submission.file.fileName,
+              contentType: submission.file.contentType,
+              size: submission.file.size,
+              href: `/api/proofs/${row.id}`,
+            }
+          : null,
+        videoUrl: submission.videoUrl,
+        status: reviewStatus,
+        rejectionReason: verification.rejectionReason?.trim() || null,
+        updatedAt: verification.updatedAt.toISOString(),
+      };
+    })
+    .sort((left, right) => {
+      const rank =
+        (reviewStatusRank[left.status] ?? 9) -
+        (reviewStatusRank[right.status] ?? 9);
+      if (rank !== 0) return rank;
+      return (
+        new Date(right.submittedAt).getTime() -
+        new Date(left.submittedAt).getTime()
+      );
+    });
+}
+
+const payoutStatusRank: Record<string, number> = {
+  claim_requested: 0,
+  paid: 1,
+  issued: 1,
+};
+
+/**
+ * Admin ETH payout queue. Pending claims first, then newest claim first.
+ */
+export async function listPayoutClaimsForAdmin(): Promise<AdminPayoutView[]> {
+  const rows = await getPrisma().reward.findMany({
+    where: {
+      status: { in: ["claim_requested", "paid", "issued"] },
+      submissionId: { not: null },
+    },
+    include: {
+      task: true,
+    },
+    orderBy: [{ claimedAt: "desc" }, { paidAt: "desc" }],
+  });
+
+  const userIds = [...new Set(rows.map((row) => row.userId))];
+  const users = userIds.length
+    ? await getPrisma().user.findMany({
+        where: { id: { in: userIds } },
+        select: { id: true, name: true, email: true },
+      })
+    : [];
+  const usersById = new Map(users.map((user) => [user.id, user]));
+
+  return rows
+    .map((row) => {
+      const reward = toReward(row);
+      const user = usersById.get(row.userId);
+      const status =
+        reward.status === "issued" ? ("paid" as const) : reward.status;
+
+      if (status !== "claim_requested" && status !== "paid") {
+        throw new Error(`Unexpected payout status ${reward.status}`);
+      }
+
+      return {
+        rewardId: reward.id,
+        submissionId: reward.submissionId!,
+        userId: reward.userId,
+        userName: user?.name?.trim() || "Unknown user",
+        userEmail: user?.email ?? null,
+        taskId: reward.taskId,
+        taskTitle: row.task.title,
+        ethAmount: reward.ethAmount,
+        payoutWalletAddress: reward.payoutWalletAddress,
+        status,
+        claimedAt: reward.claimedAt,
+        paidAt: reward.paidAt,
+        txHash: reward.txHash,
+      };
+    })
+    .sort((left, right) => {
+      const rank =
+        (payoutStatusRank[left.status] ?? 9) -
+        (payoutStatusRank[right.status] ?? 9);
+      if (rank !== 0) return rank;
+      const leftTime = left.claimedAt ?? left.paidAt ?? "";
+      const rightTime = right.claimedAt ?? right.paidAt ?? "";
+      return new Date(rightTime).getTime() - new Date(leftTime).getTime();
     });
 }

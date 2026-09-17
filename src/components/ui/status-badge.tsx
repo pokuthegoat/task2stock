@@ -4,7 +4,9 @@ const tones: Record<WorkStatus, string> = {
   in_progress: "border-white/14 text-foreground/72",
   proof_submitted: "border-white/16 text-foreground/85",
   verified: "border-positive/35 text-positive",
-  reward_issued: "border-accent/30 text-accent",
+  rejected: "border-[#c9a9a2]/45 text-[#d4b4ae]",
+  claim_requested: "border-white/18 text-foreground/88",
+  reward_paid: "border-accent/30 text-accent",
 };
 
 export function StatusBadge({

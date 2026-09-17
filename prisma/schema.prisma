@@ -160,25 +160,36 @@ model ProofSubmission {
   @@index([taskId])
 }
 
-/// Status only: none | submitted | verified. No reviewer, rejection, or method fields.
+/// Status: none | submitted | verified | rejected.
+/// rejectionReason is set only when status is rejected.
 model VerificationRecord {
-  submissionId String   @id
-  status       String
-  updatedAt    DateTime
+  submissionId     String   @id
+  status           String
+  rejectionReason  String?
+  updatedAt        DateTime
 
   submission ProofSubmission @relation(fields: [submissionId], references: [id])
 }
 
-/// Operator-issued grant after proof is verified. Status: not_issued | issued.
-/// Not a payment, payout, or Holding. Real-world delivery is outside the app.
+/// ETH payout claim after proof is verified.
+/// Status: claim_requested | paid (legacy rows may still use issued = paid).
+/// Catalog amountCents/ticker stay as task reference; ethAmount is the MVP payout.
 model Reward {
-  id           String  @id
-  userId       String
-  taskId       String
-  submissionId String?
-  amountCents  Int
-  ticker       String
-  status       String
+  id                  String    @id
+  userId              String
+  taskId              String
+  submissionId        String?   @unique
+  amountCents         Int
+  ticker              String
+  /// Configured ETH amount for manual treasury payout, e.g. "0.01".
+  ethAmount           String    @default("0.01")
+  status              String
+  /// Explicit EVM address the user provided for this claim. Not the Privy wallet.
+  payoutWalletAddress String?
+  claimedAt           DateTime?
+  paidAt              DateTime?
+  /// Optional tx hash recorded by admin after manual MetaMask send. Informational only.
+  txHash              String?
 
   user       User             @relation(fields: [userId], references: [id])
   task       Task             @relation(fields: [taskId], references: [id])
@@ -186,6 +197,7 @@ model Reward {
 
   @@index([userId])
   @@index([taskId])
+  @@index([status])
 }
 
 /// A user's ownership position. Status: preview | not_settled.

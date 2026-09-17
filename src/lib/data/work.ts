@@ -10,26 +10,42 @@ export type WorkStatus =
   | "in_progress"
   | "proof_submitted"
   | "verified"
-  | "reward_issued";
+  | "rejected"
+  | "claim_requested"
+  | "reward_paid";
 
 export const workStatusLabels: Record<WorkStatus, string> = {
   in_progress: "In progress",
-  proof_submitted: "Payout pending",
-  verified: "Verified",
-  reward_issued: "Reward issued",
+  proof_submitted: "Awaiting review",
+  verified: "Reward approved",
+  rejected: "Proof rejected",
+  claim_requested: "Claim requested",
+  reward_paid: "Reward paid",
 };
+
+export function isRewardPaidStatus(status: Reward["status"] | undefined) {
+  return status === "paid" || status === "issued";
+}
 
 export function deriveWorkStatus(progress: {
   submission: ProofSubmission | null;
   verification: VerificationRecord | null;
   reward: Reward | null;
 }): WorkStatus {
-  if (progress.reward?.status === "issued") {
-    return "reward_issued";
+  if (isRewardPaidStatus(progress.reward?.status)) {
+    return "reward_paid";
+  }
+
+  if (progress.reward?.status === "claim_requested") {
+    return "claim_requested";
   }
 
   if (progress.verification?.status === "verified") {
     return "verified";
+  }
+
+  if (progress.verification?.status === "rejected") {
+    return "rejected";
   }
 
   if (progress.submission) {
@@ -44,5 +60,6 @@ export function workHref(taskId: TaskId): string {
 }
 
 export function workActionLabel(status: WorkStatus): string {
+  if (status === "verified") return "Claim reward";
   return status === "in_progress" ? "Submit proof" : "View submission";
 }

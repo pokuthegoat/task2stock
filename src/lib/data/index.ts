@@ -4,6 +4,8 @@
  */
 
 export type {
+  AdminPayoutView,
+  AdminSubmissionView,
   ExamplePortfolioView,
   HomeActivityView,
   HomeHoldingView,
