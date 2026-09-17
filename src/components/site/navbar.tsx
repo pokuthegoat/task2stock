@@ -39,8 +39,8 @@ export function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 py-3 md:py-4">
-      <PageContainer>
+    <header className="pointer-events-none sticky top-0 z-50 -mb-[var(--nav-h)] py-3 md:py-4">
+      <PageContainer className="pointer-events-auto">
         <div className="glass-nav grid h-14 grid-cols-[1fr_auto] items-center gap-3 rounded-full pl-4 pr-2 md:grid-cols-[auto_minmax(0,1fr)_auto] md:px-3">
           <Logo className="justify-self-start" />
 
