@@ -487,8 +487,7 @@ body {
   transform: none;
 }
 
-.story-chapter-copy,
-.story-chapter-poster {
+.story-chapter-copy {
   opacity: 0.1;
   filter: blur(22px);
   transform: translate3d(0, 42px, 0);
@@ -498,12 +497,7 @@ body {
     filter 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.story-chapter-poster {
-  transition-delay: 80ms;
-}
-
-.story-chapter.is-visible .story-chapter-copy,
-.story-chapter.is-visible .story-chapter-poster {
+.story-chapter.is-visible .story-chapter-copy {
   opacity: 1;
   filter: none;
   transform: none;
