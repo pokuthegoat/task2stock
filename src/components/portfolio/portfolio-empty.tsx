@@ -58,8 +58,7 @@ export function PortfolioEmpty() {
               Your portfolio is empty
             </h2>
             <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-foreground/68">
-              Holdings appear here after proof is reviewed. Payouts go through
-              your Privy wallet, not Task2Stock.
+              Holdings appear here after proof is reviewed.
             </p>
             <div className="mt-8 flex justify-center">
               <Button href="/tasks">Explore tasks</Button>

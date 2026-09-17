@@ -2,11 +2,9 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import {
   updateDisplayNameAction,
-  updateEmailAction,
   updateUsernameAction,
 } from "@/app/actions/profile";
 import { ProfileAvatar } from "@/components/profile/profile-avatar";
-import { ProfilePasswordForm } from "@/components/profile/profile-password-form";
 import { ProfileTextForm } from "@/components/profile/profile-text-form";
 import { PageContainer } from "@/components/ui/page-container";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -84,31 +82,6 @@ export default async function ProfilePage() {
                   autoComplete="nickname"
                   initialValue={profile.displayName}
                   submitLabel="Save display name"
-                />
-              </div>
-            </div>
-
-            <div className="glass-panel p-7 md:p-10">
-              <p className="label">Account &amp; security</p>
-              <h2 className="heading mt-3 text-3xl text-foreground">
-                Email and password
-              </h2>
-              <hr className="hairline my-9" />
-              <div className="space-y-10">
-                <ProfileTextForm
-                  key={`email-${profile.email ?? "none"}`}
-                  action={updateEmailAction}
-                  field="email"
-                  label="Email"
-                  type="email"
-                  autoComplete="email"
-                  initialValue={profile.email ?? ""}
-                  cooldown={profile.emailCooldown}
-                  submitLabel="Change email"
-                />
-                <ProfilePasswordForm
-                  hasPassword={profile.hasPassword}
-                  cooldown={profile.passwordCooldown}
                 />
               </div>
             </div>
