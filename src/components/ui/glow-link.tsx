@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import type { ComponentProps } from "react";
 
@@ -10,18 +8,7 @@ export function GlowLink({
   ...rest
 }: ComponentProps<typeof Link> & { contentClassName?: string }) {
   return (
-    <Link
-      className={`relative isolate ${className}`}
-      {...rest}
-      onMouseMove={(event) => {
-        rest.onMouseMove?.(event);
-        const node = event.currentTarget;
-        const box = node.getBoundingClientRect();
-        node.style.setProperty("--spot-x", `${event.clientX - box.left}px`);
-        node.style.setProperty("--spot-y", `${event.clientY - box.top}px`);
-      }}
-    >
-      <span className="pointer-glow" aria-hidden="true" />
+    <Link className={`relative isolate ${className}`} {...rest}>
       <span className={contentClassName}>{children}</span>
     </Link>
   );

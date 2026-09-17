@@ -13,9 +13,9 @@ type ButtonProps = {
 
 const variants = {
   primary:
-    "btn-glass border-white/35 bg-accent/78 text-[#15140f] shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_14px_34px_rgba(0,0,0,0.28)] hover:border-white/45 hover:bg-accent/90",
+    "btn-glass border-white/35 bg-accent/78 text-[#15140f] hover:border-white/45 hover:bg-accent/90",
   secondary:
-    "btn-glass border-white/14 bg-white/[0.08] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_14px_34px_rgba(0,0,0,0.22)] hover:border-white/24 hover:bg-white/[0.14]",
+    "btn-glass border-white/14 bg-white/[0.08] text-foreground hover:border-white/24 hover:bg-white/[0.14]",
   ghost:
     "border-transparent bg-transparent text-foreground/70 hover:bg-white/[0.06] hover:text-foreground",
 };

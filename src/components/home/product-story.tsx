@@ -121,7 +121,7 @@ function StoryChapter({
           posterOnLeft ? "lg:order-1" : ""
         }`}
       >
-        <div className="relative aspect-[896/1120] overflow-hidden rounded-[1.75rem] border border-white/16 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_28px_80px_rgba(0,0,0,0.36)]">
+        <div className="relative aspect-[896/1120] overflow-hidden rounded-[1.75rem] border border-white/16">
           <Image
             src={step.poster}
             alt={step.title}
